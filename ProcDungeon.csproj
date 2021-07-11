@@ -1,0 +1,11 @@
+<Project Sdk="Godot.NET.Sdk/3.3.0">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+ <ItemGroup>
+    <Reference Include="ProcDungeon">
+      <HintPath>./lib/bin/ProcDungeonClassLib.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>
