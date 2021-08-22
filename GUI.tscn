@@ -32,7 +32,7 @@ __meta__ = {
 margin_left = 10.0
 margin_top = 10.0
 margin_right = 183.0
-margin_bottom = 86.0
+margin_bottom = 110.0
 size_flags_vertical = 0
 __meta__ = {
 "_edit_use_anchors_": false
@@ -90,13 +90,19 @@ max_value = 200.0
 value = 10.0
 rounded = true
 
-[node name="RegenrateBtn" type="Button" parent="PanelContainer/VBoxContainer"]
+[node name="RegenerateBtn" type="Button" parent="PanelContainer/VBoxContainer"]
 margin_top = 56.0
 margin_right = 173.0
 margin_bottom = 76.0
 size_flags_vertical = 0
 text = "Regenerate"
 
+[node name="OptionButton" type="OptionButton" parent="PanelContainer/VBoxContainer"]
+margin_top = 80.0
+margin_right = 173.0
+margin_bottom = 100.0
+text = "2D"
+
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/HSplitContainer/DungeonSize" to="." method="_on_DungeonSizeChanged"]
 [connection signal="value_changed" from="PanelContainer/VBoxContainer/HSplitContainer2/RoomCount" to="." method="_on_RoomCountChanged"]
-[connection signal="pressed" from="PanelContainer/VBoxContainer/RegenrateBtn" to="." method="_on_RegenrateBtnPressed"]
+[connection signal="pressed" from="PanelContainer/VBoxContainer/RegenerateBtn" to="." method="_on_RegenerateBtnPressed"]

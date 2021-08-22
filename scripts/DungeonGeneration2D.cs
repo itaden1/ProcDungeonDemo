@@ -16,6 +16,7 @@ public class DungeonGeneration2D : TileMap
 
 	public override void _Ready()
 	{
+		GD.Print("starting");
 		GetParent().GetNode("GUI").Connect("RegenerateDungeon", this, nameof(_onRegenerateButtonPressed));
 		Generate();
 	}

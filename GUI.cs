@@ -17,7 +17,7 @@ public class GUI : CanvasLayer
 	{
 		_roomCount = (int)value;
 	}
-	private void _on_RegenrateBtnPressed()
+	private void _on_RegenerateBtnPressed()
 	{
 		EmitSignal(nameof(RegenerateDungeon), _roomCount, _dungeonSize);
 	}
