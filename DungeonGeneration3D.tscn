@@ -1,6 +1,5 @@
-[gd_scene load_steps=4 format=2]
+[gd_scene load_steps=3 format=2]
 
-[ext_resource path="res://3DPrefabs/FPCharacter.tscn" type="PackedScene" id=1]
 [ext_resource path="res://GUI.tscn" type="PackedScene" id=2]
 [ext_resource path="res://scripts/DungeonGeneration3D.cs" type="Script" id=3]
 
@@ -10,6 +9,3 @@
 
 [node name="Dungeon" type="MeshInstance" parent="."]
 script = ExtResource( 3 )
-
-[node name="FPCharacter" parent="." instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 82.0484, 58.7928, -52.1928 )

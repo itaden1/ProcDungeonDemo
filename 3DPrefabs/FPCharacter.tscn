@@ -6,6 +6,9 @@
 
 [node name="FPCharacter" type="KinematicBody"]
 script = ExtResource( 1 )
+Speed = 2
+gravity = 0.05
+MouseSensitivity = 0.4
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 0.5, 0, 0, 0, -2.18557e-08, -1, 0, 0.5, -4.37114e-08, 0, 0, 0 )
