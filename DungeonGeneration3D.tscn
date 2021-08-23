@@ -7,5 +7,5 @@
 
 [node name="GUI" parent="." instance=ExtResource( 2 )]
 
-[node name="Dungeon" type="MeshInstance" parent="."]
+[node name="Dungeon" type="Spatial" parent="."]
 script = ExtResource( 3 )

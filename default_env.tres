@@ -1,7 +1,15 @@
 [gd_resource type="Environment" load_steps=2 format=2]
 
 [sub_resource type="ProceduralSky" id=1]
+sky_curve = 0.18
 
 [resource]
-background_mode = 2
+background_mode = 1
 background_sky = SubResource( 1 )
+ambient_light_color = Color( 0.317647, 0.376471, 0.396078, 1 )
+ambient_light_energy = 0.3
+fog_depth_enabled = false
+fog_height_enabled = true
+fog_height_min = 3.0
+fog_height_max = -2.0
+fog_height_curve = 4.28709
