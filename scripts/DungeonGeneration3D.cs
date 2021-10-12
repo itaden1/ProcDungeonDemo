@@ -43,8 +43,15 @@ public class DungeonGeneration3D : Spatial
 		var myMap = new DungeonGrid(_mapSize, alg);
 		myMap.GenerateLayout();
 
+        Mesh pillar = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres");
+        Mesh floor = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/floor.tres");
+        Mesh wallEastWest = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallEW.tres");
+        Mesh wallNorthSouth = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallNS.tres");
+
+
         SurfaceTool st = new SurfaceTool();
         st.Begin(Mesh.PrimitiveType.Triangles);
+
         // y coord becomes the z coord in 3D space
         for (int z = 0; z < myMap.Grid.GetLength(0); z++)
         {
@@ -54,27 +61,35 @@ public class DungeonGeneration3D : Spatial
                 {
                     if (myMap.Grid[z, x-1].Blocking)
                     {
-                        GenerateVerticalPlaneX(st, x, z);
-                        Mesh pillar = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres");
-                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x, 0, z)));
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        // GenerateVerticalPlaneX(st, x, z);
                     }
                     if (myMap.Grid[z-1, x].Blocking)
                     {
-                        GenerateVerticalPlaneY(st, x, z);
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
                     }
                     if (myMap.Grid[z, x+1].Blocking)
                     {
-                        GenerateVerticalPlaneX(st, x+1, z);
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
                     }
                     if (myMap.Grid[z+1, x].Blocking)
                     {
-                        GenerateVerticalPlaneY(st, x, z+1);
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
                     }
-                    GenerateHorizontalPlane(st, x, z); // floor
-                    GenerateHorizontalPlane(st, x, z, _y: 1); // roof
-                    if(!_playerSpawned) SpawnPlayer(x, z);
+                    // GenerateHorizontalPlane(st, x, z); // floor
+                    st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x*TileSize, 0, z*TileSize)));
+                    // GenerateHorizontalPlane(st, x, z, _y: 1); // roof
+                    if(!_playerSpawned){
+                        SpawnPlayer(x, z);
+                        // break;
+                    }
                 }
             }
+            // if (_playerSpawned) break;
         }
 
         st.Index();
