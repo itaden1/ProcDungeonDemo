@@ -47,6 +47,8 @@ public class DungeonGeneration3D : Spatial
         Mesh floor = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/floor.tres");
         Mesh wallEastWest = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallEW.tres");
         Mesh wallNorthSouth = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallNS.tres");
+        Mesh skirtingNorthSouth = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingNS.tres");
+        Mesh skirtingEastWest = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingEW.tres");
 
 
         SurfaceTool st = new SurfaceTool();
@@ -59,37 +61,42 @@ public class DungeonGeneration3D : Spatial
             {
                 if (myMap.Grid[z, x].Blocking == false)
                 {
+                    // int mask = getMask(myMap, x, y);
+                    // level 1 walls
                     if (myMap.Grid[z, x-1].Blocking)
                     {
-                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                        // GenerateVerticalPlaneX(st, x, z);
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
+                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(skirtingNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
                     }
                     if (myMap.Grid[z-1, x].Blocking)
                     {
                         st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(skirtingEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
                     }
                     if (myMap.Grid[z, x+1].Blocking)
                     {
-                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
+                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
+                        st.AppendFrom(skirtingNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
                     }
                     if (myMap.Grid[z+1, x].Blocking)
                     {
-                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                        st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize + TileSize)));
+                        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
+                        st.AppendFrom(skirtingEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
                     }
-                    // GenerateHorizontalPlane(st, x, z); // floor
-                    st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x*TileSize, 0, z*TileSize)));
-                    // GenerateHorizontalPlane(st, x, z, _y: 1); // roof
+
+                    st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+                    st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize, z * TileSize)));
+
+                    
                     if(!_playerSpawned){
                         SpawnPlayer(x, z);
-                        // break;
                     }
                 }
             }
-            // if (_playerSpawned) break;
         }
 
         st.Index();
@@ -106,99 +113,11 @@ public class DungeonGeneration3D : Spatial
         meshInstance.CreateTrimeshCollision();
         AddChild(meshInstance);
     }
-    private void GenerateVerticalPlaneY(SurfaceTool st, int _x, int _z)
+
+    private int getMask(DungeonGrid myMap, int x, object y)
     {
-        int x = _x * TileSize;
-        int z = _z * TileSize;
 
-        // First triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y2));
-        st.AddVertex(new Vector3(x, 0, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y1));
-        st.AddVertex(new Vector3(x, TileSize, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y1));
-        st.AddVertex(new Vector3(x + TileSize, TileSize, z));
-
-        // Second triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y2));
-        st.AddVertex(new Vector3(x, 0, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y1));
-        st.AddVertex(new Vector3(x + TileSize, TileSize, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y2));
-        st.AddVertex(new Vector3(x + TileSize, 0, z));
-    }
-    private void GenerateVerticalPlaneX(SurfaceTool st, int _x, int _z)
-    {
-        int x = _x * TileSize;
-        int z = _z * TileSize;
-
-        // First triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y2));
-        st.AddVertex(new Vector3(x, 0, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y1));
-        st.AddVertex(new Vector3(x, TileSize, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y1));
-        st.AddVertex(new Vector3(x, TileSize, z + TileSize));
-
-        // Second triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x1, _wallUV.y2));
-        st.AddVertex(new Vector3(x, 0, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y1));
-        st.AddVertex(new Vector3(x, TileSize, z + TileSize));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(_wallUV.x2, _wallUV.y2));
-        st.AddVertex(new Vector3(x, 0, z + TileSize));
-    }
-    private void GenerateHorizontalPlane(SurfaceTool st, int _x, int _z, int _y = 0)
-    {
-        int x = _x * TileSize;
-        int z = _z * TileSize;
-        int y = _y * TileSize;
-
-        // First triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(0, 0));
-        st.AddVertex(new Vector3(x, y, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(UVOffset, 0));
-        st.AddVertex(new Vector3(x + TileSize, y, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(0, UVOffset));
-        st.AddVertex(new Vector3(x, y, z + TileSize));
-
-        // second triangle
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(UVOffset, 0));
-        st.AddVertex(new Vector3(x + TileSize, y, z));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(UVOffset, UVOffset));
-        st.AddVertex(new Vector3(x + TileSize, y, z + TileSize));
-
-        st.AddNormal(new Vector3(0, 0, 1));
-        st.AddUv(new Vector2(0, UVOffset));
-        st.AddVertex(new Vector3(x, y, z + TileSize));
+        throw new NotImplementedException();
     }
 
     public void SpawnPlayer(int _x, int _y)
