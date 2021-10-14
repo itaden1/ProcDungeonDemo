@@ -216,6 +216,9 @@ public class DungeonGeneration3D : Spatial
                         case 255: //t46
                             buildTallOpen(st, x, z);
                             break;
+                        case 0: //t47
+                            buildTest(st, x, z);
+                            break;
                     }
                     // level 1 walls
                     // if (myMap.Grid[z, x-1].Blocking)
