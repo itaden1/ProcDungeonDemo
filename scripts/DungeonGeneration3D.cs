@@ -16,10 +16,10 @@ public struct UVCoordSet
 public class DungeonGeneration3D : Spatial
 {
     [Export]
-	private int _mapSize = 40;
+	private int _mapSize = 10;
 
 	[Export]
-	private int _roomCount = 25;
+	private int _roomCount = 1;
 
     [Export]
     public int TileSize = 2;
@@ -76,10 +76,10 @@ public class DungeonGeneration3D : Spatial
                 if (myMap.Grid[z, x].Blocking == false)
                 {
                     int mask = getFourBitMask(myMap.Grid, x, z);
-                    // { 2 = 1, 8 = 2, 10 = 3, 11 = 4, 16 = 5, 18 = 6, 22 = 7, 24 = 8, 26 = 9, 27 = 10, 30 = 11, 31 = 12, 64 = 13, 66 = 14, 72 = 15, 74 = 16, 75 = 17, 80 = 18, 82 = 19, 86 = 20, 88 = 21, 90 = 22, 91 = 23, 94 = 24, 95 = 25, 104 = 26, 106 = 27, 107 = 28, 120 = 29, 122 = 30, 123 = 31, 126 = 32, 127 = 33, 208 = 34, 210 = 35, 214 = 36, 216 = 37, 218 = 38, 219 = 39, 222 = 40, 223 = 41, 248 = 42, 250 = 43, 251 = 44, 254 = 45, 255 = 46, 0 = 47 }
+                    GD.Print(mask);
                     switch(mask)
                     {
-                        case 2: // t1  open all sides
+                        case 2: // open all sides
                             buildTallOpen(st, x, z);
                             break;
                         case 8: // t2
@@ -88,20 +88,18 @@ public class DungeonGeneration3D : Spatial
                         case 10: // t3
                             buildTest(st, x, z);
                             break;
-                        case 11: // t4
-                            buildTest(st, x, z);
+                        case 11: // south east corner
+                            buildCornerSouthEast(st, x, z);
                             break;
                         case 16: //t5
-                            buildCornerSouthEast(st, x, z);
                             break;
                         case 18: // t6
                             buildTest(st, x, z);
                             break;
-                        case 22: // t7
-                            buildTest(st, x, z);
+                        case 22: // south west corner
+                            buildCornerSouthWest(st, x, z);
                             break;
                         case 24: // t8
-                            buildCornerSouthWest(st, x, z);
                             break;
                         case 26: // t9
                             buildTest(st, x, z);
@@ -112,11 +110,10 @@ public class DungeonGeneration3D : Spatial
                         case 30: // t11
                             buildTest(st, x, z);
                             break;
-                        case 31: // t12
-                            buildTest(st, x, z);
+                        case 31: // south wall
+                            buildWallSouth(st, x, z);
                             break;
                         case 64: // t13
-                            buildWallSouth(st, x, z);
                             break;
                         case 66: // t14
                             buildTest(st, x, z);
@@ -154,16 +151,15 @@ public class DungeonGeneration3D : Spatial
                         case 95: //t25
                             buildTest(st, x, z);
                             break;
-                        case 104: //t26
-                            buildTest(st, x, z);
-                            break;
-                        case 106: //t27
+                        case 104: // north east corner
                             buildCornerNorthEast(st, x, z);
                             break;
-                        case 107: //t28
+                        case 106: //t27
+                            break;
+                        case 107: // west wall
+                            buildWallEast( st, x, z);
                             break;
                         case 120: //t29
-                            buildWallEast( st, x, z);
                             break;
                         case 122: // 30
                             buildTest(st, x, z);
@@ -177,17 +173,15 @@ public class DungeonGeneration3D : Spatial
                         case 127: //t33
                             buildTest(st, x, z);
                             break;
-                        case 208: // t34
-                            buildTest(st, x, z);
-                            break;
-                        case 210: //t35
+                        case 208: // north west corner
                             buildCornerNorthWest(st, x, z);
                             break;
+                        case 210: //t35
+                            break;
                         case 214: //t36
-                            buildTest(st, x, z);
+                            buildWallWest(st, x, z);
                             break;
                         case 216: //t37
-                            buildWallWest(st, x, z);
                             break;
                         case 218: //t38
                             buildTest(st, x, z);
@@ -201,19 +195,18 @@ public class DungeonGeneration3D : Spatial
                         case 223: //t41
                             buildTest(st, x, z);
                             break;
-                        case 248: //t42
-                            buildTest(st, x, z);
+                        case 248: // north wall
+                            buildWallNorth(st, x, z);
                             break;
                         case 250: //t43
-                            buildWallNorth(st, x, z);
                             break;
                         case 251: //t44
                             buildTest(st, x, z);
                             break;
                         case 254: //t45
-                            buildTallOpen(st, x, z);
+                            // buildTallOpen(st, x, z);
                             break;
-                        case 255: //t46
+                        case 255: // open all sides
                             buildTallOpen(st, x, z);
                             break;
                         case 0: //t47
@@ -274,6 +267,7 @@ public class DungeonGeneration3D : Spatial
 
     private void buildWallNorth(SurfaceTool st, int x, int z)
     {
+        GD.Print("north");
         // Build a wall on the south side rest open
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
@@ -282,6 +276,7 @@ public class DungeonGeneration3D : Spatial
 
     private void buildWallSouth(SurfaceTool st, int x, int z)
     {
+        GD.Print("south");
         // Build a wall on the south side rest open
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
@@ -290,6 +285,7 @@ public class DungeonGeneration3D : Spatial
 
     private void buildWallEast(SurfaceTool st, int x, int z)
     {
+        GD.Print("east");
         // Build a wall on the south side rest open
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
@@ -297,6 +293,7 @@ public class DungeonGeneration3D : Spatial
     }
     private void buildWallWest(SurfaceTool st, int x, int z)
     {
+        GD.Print("west");
         // Build a wall on the south side rest open
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
@@ -306,6 +303,7 @@ public class DungeonGeneration3D : Spatial
 
     private void buildCornerNorthWest(SurfaceTool st, int x, int z)
     {
+        GD.Print("NW");
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
         st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
@@ -314,6 +312,7 @@ public class DungeonGeneration3D : Spatial
 
     private void buildCornerNorthEast(SurfaceTool st, int x, int z)
     {
+                GD.Print("NE");
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
         st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
@@ -322,18 +321,20 @@ public class DungeonGeneration3D : Spatial
 
     private void buildCornerSouthWest(SurfaceTool st, int x, int z)
     {
+                GD.Print("SW");
         // Build a corner peice on south west corner
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize, z * TileSize)));
+        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
         st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
         st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
     }
 
     private void buildCornerSouthEast(SurfaceTool st, int x, int z)
     {
+                        GD.Print("SE");
         // Build a corner peice on south east corner
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize, z * TileSize)));
+        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
         st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
         st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
     }
@@ -350,13 +351,15 @@ public class DungeonGeneration3D : Spatial
 
     private void buildTallOpen(SurfaceTool st, int x, int z)
     {
+        GD.Print("open");
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
         st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
     }
 
     private void buildTest(SurfaceTool st, int x, int z)
     {
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
+        GD.Print("#$%*&^");
+        // st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
     }
 
     private int getPosExponent(Tile[,] grid, int x, int z)
@@ -369,7 +372,8 @@ public class DungeonGeneration3D : Spatial
     {
 
         int total = 0;
-        Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>{
+        Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>
+        {
             {1, new Vector2(x-1, z-1)},
             {2, new Vector2(x, z-1)},
             {4, new Vector2(x+1, z-1)},
@@ -379,9 +383,30 @@ public class DungeonGeneration3D : Spatial
             {64, new Vector2(x, z+1)},
             {128, new Vector2(x+1, z+1)},
         };
+        // Dictionary<int, Vector2> corners = new Dictionary<int, Vector2>
+        // {
+        //     {1, new Vector2(x-1, z-1)},
+        //     {4, new Vector2(x+1, z-1)},
+        //     {32, new Vector2(x-1, z+1)},
+        //     {128, new Vector2(x+1, z+1)}
+        // };
+
+        int cornerCounter = 0;
         foreach(var pos in positions)
         {
-            total += pos.Key * getPosExponent(grid, (int)pos.Value.x, (int)pos.Value.y);
+            int _x = (int)pos.Value.x;
+            int _z = (int)pos.Value.y;
+
+            // only do the calculation if the corner tile has adjacent tiles as well
+            int exp =(int)Math.Pow(2, cornerCounter);
+            bool add = true;
+            if (exp == 1 && grid[x, z-1].Blocking && grid[x-1, z].Blocking) add = false;
+            if (exp == 4 && grid[x, z-1].Blocking && grid[x+1, z].Blocking) add = false;
+            if (exp == 32 && grid[x-1, z].Blocking && grid[x, z+1].Blocking) add = false;
+            if (exp == 128 && grid[x+1, z].Blocking && grid[x, z+1].Blocking) add = false;
+
+            if (add) total += pos.Key * getPosExponent(grid, _x, _z);
+            cornerCounter++;
         }
         return total;
     }
