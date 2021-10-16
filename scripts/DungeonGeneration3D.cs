@@ -65,7 +65,7 @@ public class DungeonGeneration3D : Spatial
         Dictionary<int, TileBuilderBase> tileSet = new Dictionary<int, TileBuilderBase>
         {
             { 0, new TestTileBuilder(TileSize, meshSet) },
-            { 2, new TestTileBuilder(TileSize, meshSet) },
+            { 2, new NorthWallBuilder3D(TileSize, meshSet) },
             { 8, new TestTileBuilder(TileSize, meshSet) },
             { 10, new TestTileBuilder(TileSize, meshSet) },
             { 11, new CornerSouthEastBuilder3D(TileSize, meshSet) },
@@ -76,8 +76,8 @@ public class DungeonGeneration3D : Spatial
             { 26, new TestTileBuilder(TileSize, meshSet) },
             { 27, new TestTileBuilder(TileSize, meshSet) },
             { 30, new TestTileBuilder(TileSize, meshSet) },
-            { 31, new SouthWallBuilder3D(TileSize, meshSet) },
-            { 64, new TestTileBuilder(TileSize, meshSet) },
+            { 31, new TestTileBuilder(TileSize, meshSet) },
+            { 64, new SouthWallBuilder3D(TileSize, meshSet) },
             { 66, new TestTileBuilder(TileSize, meshSet) },
             { 72, new CornerNorthEastBuilder3D(TileSize, meshSet) },
             { 74, new TestTileBuilder(TileSize, meshSet) },
@@ -106,7 +106,7 @@ public class DungeonGeneration3D : Spatial
             { 219, new TestTileBuilder(TileSize, meshSet) },
             { 222, new TestTileBuilder(TileSize, meshSet) },
             { 223, new TestTileBuilder(TileSize, meshSet) },
-            { 248, new NorthWallBuilder3D(TileSize, meshSet) },
+            { 248, new TestTileBuilder(TileSize, meshSet) },
             { 250, new TestTileBuilder(TileSize, meshSet) },
             { 251, new TestTileBuilder(TileSize, meshSet) },
             { 254, new TestTileBuilder(TileSize, meshSet) },
@@ -165,7 +165,6 @@ public class DungeonGeneration3D : Spatial
     private int getFourBitMask(Tile[,] grid, int x, int z)
     {
 
-        int total = 0;
         Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>
         {
             {1, new Vector2(x-1, z-1)},
@@ -177,29 +176,19 @@ public class DungeonGeneration3D : Spatial
             {64, new Vector2(x, z+1)},
             {128, new Vector2(x+1, z+1)},
         };
-        // Dictionary<int, Vector2> corners = new Dictionary<int, Vector2>
-        // {
-        //     {1, new Vector2(x-1, z-1)},
-        //     {4, new Vector2(x+1, z-1)},
-        //     {32, new Vector2(x-1, z+1)},
-        //     {128, new Vector2(x+1, z+1)}
-        // };
 
-        // int tileCounter = 0;
+        int total = 0;
         foreach(var pos in positions)
         {
             int _x = (int)pos.Value.x;
             int _z = (int)pos.Value.y;
 
-            // only do the calculation if the corner tile has adjacent tiles as well
-            // int exp =(int)Math.Pow(2, tileCounter);
-            // GD.Print($"****{exp}");
             bool add = true;
-            if (pos.Key == 1 && grid[z, x-1].Blocking && grid[z-1, x].Blocking) add = false;
-            if (pos.Key == 4 && grid[z, x-1].Blocking && grid[z+1, x].Blocking) add = false;
-            if (pos.Key == 32 && grid[z-1, x].Blocking && grid[z, x+1].Blocking) add = false;
-            if (pos.Key == 128 && grid[z+1, x].Blocking && grid[z, x+1].Blocking) add = false;
-
+            if (pos.Key == 1 && grid[_z+1, _x].Blocking || grid[_z, _x+1].Blocking) add = false;
+            if (pos.Key == 4 && grid[_z, _x-1].Blocking || grid[_z+1, _x].Blocking) add = false;
+            if (pos.Key == 32 && grid[_z-1, _x].Blocking || grid[_z, _x+1].Blocking) add = false;
+            if (pos.Key == 128 && grid[_z, _x-1].Blocking || grid[_z-1, _x].Blocking) add = false;
+            
             if (add) total += pos.Key * getPosExponent(grid, _x, _z);
             // tileCounter++;
         }

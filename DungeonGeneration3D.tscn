@@ -7,7 +7,6 @@
 
 [node name="World" type="Spatial"]
 script = ExtResource( 1 )
-RoomCount = 2
 
 [node name="GUI" parent="." instance=ExtResource( 2 )]
 

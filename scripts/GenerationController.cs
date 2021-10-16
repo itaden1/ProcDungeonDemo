@@ -10,7 +10,7 @@ public class GenerationController : Spatial
 	public int MapSize = 10;
 
 	[Export]
-	public int RoomCount = 1;
+	public int RoomCount = 2;
 
     public override void _Ready()
     {
