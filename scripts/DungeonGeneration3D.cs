@@ -68,9 +68,9 @@ public class DungeonGeneration3D : Spatial
             { 2, new TestTileBuilder(TileSize, meshSet) },
             { 8, new TestTileBuilder(TileSize, meshSet) },
             { 10, new TestTileBuilder(TileSize, meshSet) },
-            { 11, new TestTileBuilder(TileSize, meshSet) },
+            { 11, new CornerSouthEastBuilder3D(TileSize, meshSet) },
             { 16, new TestTileBuilder(TileSize, meshSet) },
-            { 18, new TestTileBuilder(TileSize, meshSet) },
+            { 18, new CornerSouthWestBuilder3D(TileSize, meshSet) },
             { 22, new TestTileBuilder(TileSize, meshSet) },
             { 24, new TestTileBuilder(TileSize, meshSet) },
             { 26, new TestTileBuilder(TileSize, meshSet) },
@@ -79,7 +79,7 @@ public class DungeonGeneration3D : Spatial
             { 31, new SouthWallBuilder3D(TileSize, meshSet) },
             { 64, new TestTileBuilder(TileSize, meshSet) },
             { 66, new TestTileBuilder(TileSize, meshSet) },
-            { 72, new TestTileBuilder(TileSize, meshSet) },
+            { 72, new CornerNorthEastBuilder3D(TileSize, meshSet) },
             { 74, new TestTileBuilder(TileSize, meshSet) },
             { 75, new TestTileBuilder(TileSize, meshSet) },
             { 80, new TestTileBuilder(TileSize, meshSet) },
@@ -127,178 +127,11 @@ public class DungeonGeneration3D : Spatial
                     // GD.Print(mask);
                     if (tileSet.ContainsKey(mask))
                     {
+                        GD.Print(mask);
                         TileBuilderBase tb = tileSet[mask];
                         tb.Build(st, x, z);
                     }
                     else GD.Print($"Missing key: {mask}");
-
-
-                    // switch(mask)
-                    // {
-                    //     case 2: // open all sides
-                    //         buildTallOpen(st, x, z);
-                    //         break;
-                    //     case 8: // t2
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 10: // t3
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 11: // south east corner
-                    //         buildCornerSouthEast(st, x, z);
-                    //         break;
-                    //     case 16: //t5
-                    //         break;
-                    //     case 18: // t6
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 22: // south west corner
-                    //         buildCornerSouthWest(st, x, z);
-                    //         break;
-                    //     case 24: // t8
-                    //         break;
-                    //     case 26: // t9
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 27: //t10
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 30: // t11
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 31: // south wall
-                    //         // buildWallSouth(st, x, z);
-                    //         SouthWallBuilder3D b = new SouthWallBuilder3D(TileSize);
-                    //         b.Build(st, x, z);
-                    //         break;
-                    //     case 64: // t13
-                    //         break;
-                    //     case 66: // t14
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 72: // t15
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 74: //t16
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 75: // t17
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 80: //t18
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 82: //t19
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 86: // t20
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 88: // t21
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 90: //t22
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 91: //t23
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 94: //t24
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 95: //t25
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 104: // north east corner
-                    //         buildCornerNorthEast(st, x, z);
-                    //         break;
-                    //     case 106: //t27
-                    //         break;
-                    //     case 107: // west wall
-                    //         buildWallEast( st, x, z);
-                    //         break;
-                    //     case 120: //t29
-                    //         break;
-                    //     case 122: // 30
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 123: //t31
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 126: //t32
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 127: //t33
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 208: // north west corner
-                    //         buildCornerNorthWest(st, x, z);
-                    //         break;
-                    //     case 210: //t35
-                    //         break;
-                    //     case 214: //t36
-                    //         buildWallWest(st, x, z);
-                    //         break;
-                    //     case 216: //t37
-                    //         break;
-                    //     case 218: //t38
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 219: //t39
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 222: //t40
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 223: //t41
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 248: // north wall
-                    //         buildWallNorth(st, x, z);
-                    //         break;
-                    //     case 250: //t43
-                    //         break;
-                    //     case 251: //t44
-                    //         buildTest(st, x, z);
-                    //         break;
-                    //     case 254: //t45
-                    //         // buildTallOpen(st, x, z);
-                    //         break;
-                    //     case 255: // open all sides
-                    //         buildTallOpen(st, x, z);
-                    //         break;
-                    //     case 0: //t47
-                    //         buildTest(st, x, z);
-                    //         break;
-                    // }
-                    // level 1 walls
-                    // if (myMap.Grid[z, x-1].Blocking)
-                    // {
-                    //     st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-                    //     st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    //     st.AppendFrom(skirtingNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    // }
-                    // if (myMap.Grid[z-1, x].Blocking)
-                    // {
-                    //     st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    //     st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    //     st.AppendFrom(skirtingEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    // }
-                    // if (myMap.Grid[z, x+1].Blocking)
-                    // {
-                    //     st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-                    //     st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-                    //     st.AppendFrom(skirtingNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-                    // }
-                    // if (myMap.Grid[z+1, x].Blocking)
-                    // {
-                    //     st.AppendFrom(pillar, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize + TileSize)));
-                    //     st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-                    //     st.AppendFrom(skirtingEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-                    // }
-
-                    // st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-                    // st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize, z * TileSize)));
 
                     
                     if(!_playerSpawned){
@@ -321,103 +154,6 @@ public class DungeonGeneration3D : Spatial
         meshInstance.Mesh = mesh;
         meshInstance.CreateTrimeshCollision();
         AddChild(meshInstance);
-    }
-
-    // private void buildWallNorth(SurfaceTool st, int x, int z)
-    // {
-    //     GD.Print("north");
-    //     // Build a wall on the south side rest open
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-    //     st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    // }
-
-    // private void buildWallSouth(SurfaceTool st, int x, int z)
-    // {
-    //     GD.Print("south");
-    //     // Build a wall on the south side rest open
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-    //     st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-    // }
-
-    // private void buildWallEast(SurfaceTool st, int x, int z)
-    // {
-    //     GD.Print("east");
-    //     // Build a wall on the south side rest open
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-    //     st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-    // }
-    // private void buildWallWest(SurfaceTool st, int x, int z)
-    // {
-    //     GD.Print("west");
-    //     // Build a wall on the south side rest open
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    //     st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-    //     st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    // }
-
-
-    private void buildCornerNorthWest(SurfaceTool st, int x, int z)
-    {
-        GD.Print("NW");
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    }
-
-    private void buildCornerNorthEast(SurfaceTool st, int x, int z)
-    {
-                GD.Print("NE");
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-    }
-
-    private void buildCornerSouthWest(SurfaceTool st, int x, int z)
-    {
-                GD.Print("SW");
-        // Build a corner peice on south west corner
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-    }
-
-    private void buildCornerSouthEast(SurfaceTool st, int x, int z)
-    {
-                        GD.Print("SE");
-        // Build a corner peice on south east corner
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-    }
-
-    private void buildOpenNorth(SurfaceTool st, int x, int z)
-    {
-        // build a three sided square with opening to the north
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize, z * TileSize)));
-        st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize + TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * TileSize + TileSize, 0, z * TileSize)));
-    }
-
-    private void buildTallOpen(SurfaceTool st, int x, int z)
-    {
-        GD.Print("open");
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
-        st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, TileSize * 2, z * TileSize)));
-    }
-
-    private void buildTest(SurfaceTool st, int x, int z)
-    {
-        GD.Print("#$%*&^");
-        // st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * TileSize, 0, z * TileSize)));
     }
 
     private int getPosExponent(Tile[,] grid, int x, int z)
@@ -480,14 +216,18 @@ public class DungeonGeneration3D : Spatial
         Transform playerTransform = new Transform(player.Transform.basis, new Vector3(x, Transform.origin.y + 1, y));
         player.Transform = playerTransform;
         player.Name = "Player";
-        AddChild(player);
+        Node world = GetTree().Root.GetNode("World");
+        world.CallDeferred("add_child", player);
+
+        Map map = GetTree().Root.GetNode<Map>("World/CanvasLayer/Map");
+        map.ConnectPlayerSignal(player, "ShowMap");
 
         _playerSpawned = true;
 
     }
     private async void _onRegenerateButtonPressed(int rooms, int mapSize)
     {
-        var player = GetNode("Player");
+        var player = GetTree().Root.GetNode("World/Player");
         player.QueueFree();
         _playerSpawned = false;
         var dungeon = GetNode("DungeonMesh");

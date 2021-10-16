@@ -29,5 +29,6 @@ public class GenerationController : Spatial
 
         dungeon3D.Generate(myMap);
         dungeonMap.Generate(myMap.Grid);
+        dungeonMap.Update();
     }
 }

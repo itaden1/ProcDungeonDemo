@@ -6,8 +6,8 @@ public class GUI : CanvasLayer
 	[Signal]
 	public delegate void RegenerateDungeon(int rooms, int size);
 	
-	private int _roomCount = 30;
-	private int _dungeonSize = 50;
+	private int _roomCount = 1;
+	private int _dungeonSize = 10;
 
 	private void _on_DungeonSizeChanged(float value)
 	{

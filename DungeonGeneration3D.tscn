@@ -5,8 +5,9 @@
 [ext_resource path="res://scripts/DungeonGeneration3D.cs" type="Script" id=3]
 [ext_resource path="res://scripts/Map.cs" type="Script" id=4]
 
-[node name="Spatial" type="Spatial"]
+[node name="World" type="Spatial"]
 script = ExtResource( 1 )
+RoomCount = 2
 
 [node name="GUI" parent="." instance=ExtResource( 2 )]
 
@@ -16,4 +17,5 @@ script = ExtResource( 3 )
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Map" type="Node2D" parent="CanvasLayer"]
+position = Vector2( 4.10431, 1.29782 )
 script = ExtResource( 4 )

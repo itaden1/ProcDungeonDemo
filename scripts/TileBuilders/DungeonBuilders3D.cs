@@ -103,4 +103,67 @@ namespace ProcDungeon.TileBuilders
             st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
         }
     }
+    public class CornerNorthEastBuilder3D: TileBuilderBase
+    {
+        public CornerNorthEastBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("NE");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corner on the north east
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class CornerSouthWestBuilder3D: TileBuilderBase
+    {
+        public CornerSouthWestBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("SW");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corner on the south west
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize + _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class CornerSouthEastBuilder3D: TileBuilderBase
+    {
+        public CornerSouthEastBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("SE");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+        // Build a corner peice on south east corner
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize + _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+        }
+    }
 }

@@ -8,12 +8,14 @@ public class FPCharacter : KinematicBody
     [Export]
     public int Acceleration = 10;
     [Export]
-    public float gravity = 0; //0.09F;
+    public float gravity = 0.09F;
     [Export]
     public int Jump = 10;
-
     [Export]
     public float MouseSensitivity = 0.03F;
+
+    [Signal]
+    public delegate void ShowMap();
 
     private Vector3 _velocity;
     private Vector3 _fall;
@@ -41,6 +43,10 @@ public class FPCharacter : KinematicBody
             else {
                 Input.SetMouseMode(Input.MouseMode.Captured);
             }
+        }
+        if (inputEvent.IsActionPressed("ShowMap"))
+        {
+            EmitSignal(nameof(ShowMap));
         }
     }
     public override void _PhysicsProcess(float delta)
