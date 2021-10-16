@@ -8,7 +8,7 @@ public class FPCharacter : KinematicBody
     [Export]
     public int Acceleration = 10;
     [Export]
-    public float gravity = 0.09F;
+    public float gravity = 0; //0.09F;
     [Export]
     public int Jump = 10;
 
@@ -89,15 +89,15 @@ public class FPCharacter : KinematicBody
             _direction += Transform.basis.x;
         }
 
-        if (!IsOnFloor())
-        {
-            _fall.y -= gravity;
-            MoveAndSlide(_fall, Vector3.Up);
-        }
-        else
-        {
-            _fall.y = 0;
-        }
+        // if (!IsOnFloor())
+        // {
+        //     _fall.y -= gravity;
+        //     MoveAndSlide(_fall, Vector3.Up);
+        // }
+        // else
+        // {
+        //     _fall.y = 0;
+        // }
 
         _direction = _direction.Normalized();
         _velocity = _velocity.LinearInterpolate(_direction * Speed, Acceleration * delta);

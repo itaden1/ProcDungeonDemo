@@ -1,0 +1,106 @@
+using System.Collections.Generic;
+using Godot;
+
+namespace ProcDungeon.TileBuilders
+{
+    public class SouthWallBuilder3D: TileBuilderBase
+    {
+        public SouthWallBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("south");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+
+            // Build a wall on the south side rest open
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize + _tileSize)));
+        }
+    }
+
+    public class NorthWallBuilder3D: TileBuilderBase
+    {
+        public NorthWallBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("north");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a wall on the north side rest open
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class WestWallBuilder3D: TileBuilderBase
+    {
+        public WestWallBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("west");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+
+            // Build a wall on the west side rest open
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class EastWallBuilder3D: TileBuilderBase
+    {
+        public EastWallBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("east");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+
+            // Build a wall on the east side rest open
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+        }
+    }
+
+    public class CornerNorthWestBuilder3D: TileBuilderBase
+    {
+        public CornerNorthWestBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            GD.Print("NW");
+
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corner on the north west
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
+}
