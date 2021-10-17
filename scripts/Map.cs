@@ -41,6 +41,7 @@ public class Map : Node2D
                 {
                     Rect2 rect = new Rect2(x * tileSize, y * tileSize, tileSize, tileSize);
                     DrawRect(rect, new Color(2, 2, 2, 0.3f));
+                    DrawRect(rect, new Color(5, 2, 2, 0.3f), false, 1);
                 }
             }
         }

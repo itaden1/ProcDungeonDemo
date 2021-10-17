@@ -16,5 +16,5 @@ script = ExtResource( 3 )
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
 [node name="Map" type="Node2D" parent="CanvasLayer"]
-position = Vector2( 4.10431, 1.29782 )
+position = Vector2( 190.57, 124.196 )
 script = ExtResource( 4 )

@@ -11,8 +11,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("south");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallEastWest = _meshSet["wallEastWest"];
 
@@ -32,8 +30,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("north");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallEastWest = _meshSet["wallEastWest"];
 
@@ -51,8 +47,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("west");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
 
@@ -70,8 +64,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("east");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
 
@@ -90,8 +82,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("NW");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
             Mesh wallEastWest = _meshSet["wallEastWest"];
@@ -111,8 +101,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("NE");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
             Mesh wallEastWest = _meshSet["wallEastWest"];
@@ -132,8 +120,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("SW");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
             Mesh wallEastWest = _meshSet["wallEastWest"];
@@ -153,8 +139,6 @@ namespace ProcDungeon.TileBuilders
 
         public override void Build(SurfaceTool st, int x, int z)
         {        
-            GD.Print("SE");
-
             Mesh floor = _meshSet["floor"];
             Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
             Mesh wallEastWest = _meshSet["wallEastWest"];

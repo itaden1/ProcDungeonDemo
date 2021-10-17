@@ -20,37 +20,17 @@ public class DungeonGeneration3D : Spatial
 {
     [Export]
     public int TileSize = 2;
- 
-    private Mesh pillar;
-    private Mesh floor;
-    private Mesh wallEastWest;
-    private Mesh wallNorthSouth;
-    private Mesh skirtingNorthSouth;
-    private Mesh skirtingEastWest;
 
     private bool _playerSpawned = false;
     public override void _Ready()
     {
         GD.Print("starting");
         GetParent().GetNode("GUI").Connect("RegenerateDungeon", this, nameof(_onRegenerateButtonPressed));
-        pillar = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres");
-        floor = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/floor.tres");
-        wallEastWest = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallEW.tres");
-        wallNorthSouth = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallNS.tres");
-        skirtingNorthSouth = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingNS.tres");
-        skirtingEastWest = (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingEW.tres");
-		// Generate();
+
     }
 
     public void Generate(DungeonGrid myMap)
     {
-        // GD.Print("generating");
-		// var alg = new BSPDungeonAlgorythm(_roomCount);
-		// var myMap = new DungeonGrid(_mapSize, alg);
-		// myMap.GenerateLayout();
-
-
-
         Dictionary<string, Mesh> meshSet = new Dictionary<string, Mesh>
         {
             {"pillar", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres")},
@@ -65,21 +45,21 @@ public class DungeonGeneration3D : Spatial
         Dictionary<int, TileBuilderBase> tileSet = new Dictionary<int, TileBuilderBase>
         {
             { 0, new TestTileBuilder(TileSize, meshSet) },
-            { 2, new NorthWallBuilder3D(TileSize, meshSet) },
+            { 2, new TestTileBuilder(TileSize, meshSet) },
             { 8, new TestTileBuilder(TileSize, meshSet) },
             { 10, new TestTileBuilder(TileSize, meshSet) },
             { 11, new CornerSouthEastBuilder3D(TileSize, meshSet) },
             { 16, new TestTileBuilder(TileSize, meshSet) },
-            { 18, new CornerSouthWestBuilder3D(TileSize, meshSet) },
-            { 22, new TestTileBuilder(TileSize, meshSet) },
+            { 18, new TestTileBuilder(TileSize, meshSet) },
+            { 22, new CornerSouthWestBuilder3D(TileSize, meshSet) },
             { 24, new TestTileBuilder(TileSize, meshSet) },
             { 26, new TestTileBuilder(TileSize, meshSet) },
             { 27, new TestTileBuilder(TileSize, meshSet) },
             { 30, new TestTileBuilder(TileSize, meshSet) },
-            { 31, new TestTileBuilder(TileSize, meshSet) },
-            { 64, new SouthWallBuilder3D(TileSize, meshSet) },
+            { 31, new SouthWallBuilder3D(TileSize, meshSet) },
+            { 64, new TestTileBuilder(TileSize, meshSet) },
             { 66, new TestTileBuilder(TileSize, meshSet) },
-            { 72, new CornerNorthEastBuilder3D(TileSize, meshSet) },
+            { 72, new TestTileBuilder(TileSize, meshSet) },
             { 74, new TestTileBuilder(TileSize, meshSet) },
             { 75, new TestTileBuilder(TileSize, meshSet) },
             { 80, new TestTileBuilder(TileSize, meshSet) },
@@ -90,7 +70,7 @@ public class DungeonGeneration3D : Spatial
             { 91, new TestTileBuilder(TileSize, meshSet) },
             { 94, new TestTileBuilder(TileSize, meshSet) },
             { 95, new TestTileBuilder(TileSize, meshSet) },
-            { 104, new TestTileBuilder(TileSize, meshSet) },
+            { 104, new CornerNorthEastBuilder3D(TileSize, meshSet) },
             { 106, new TestTileBuilder(TileSize, meshSet) },
             { 107, new EastWallBuilder3D(TileSize, meshSet) },
             { 120, new TestTileBuilder(TileSize, meshSet) },
@@ -106,7 +86,7 @@ public class DungeonGeneration3D : Spatial
             { 219, new TestTileBuilder(TileSize, meshSet) },
             { 222, new TestTileBuilder(TileSize, meshSet) },
             { 223, new TestTileBuilder(TileSize, meshSet) },
-            { 248, new TestTileBuilder(TileSize, meshSet) },
+            { 248, new NorthWallBuilder3D(TileSize, meshSet) },
             { 250, new TestTileBuilder(TileSize, meshSet) },
             { 251, new TestTileBuilder(TileSize, meshSet) },
             { 254, new TestTileBuilder(TileSize, meshSet) },
@@ -124,11 +104,10 @@ public class DungeonGeneration3D : Spatial
                 if (myMap.Grid[z, x].Blocking == false)
                 {
                     int mask = getFourBitMask(myMap.Grid, x, z);
-                    // GD.Print(mask);
                     if (tileSet.ContainsKey(mask))
                     {
-                        GD.Print(mask);
                         TileBuilderBase tb = tileSet[mask];
+                        GD.Print($"{mask}: {tb}");
                         tb.Build(st, x, z);
                     }
                     else GD.Print($"Missing key: {mask}");
@@ -156,12 +135,6 @@ public class DungeonGeneration3D : Spatial
         AddChild(meshInstance);
     }
 
-    private int getPosExponent(Tile[,] grid, int x, int z)
-    {
-        //TODO need extra check that corner tiles have adjacent neighbourd also adjacent to original
-        if (grid[z, x].Blocking) return 0;
-        return 1;
-    }
     private int getFourBitMask(Tile[,] grid, int x, int z)
     {
 
@@ -177,20 +150,21 @@ public class DungeonGeneration3D : Spatial
             {128, new Vector2(x+1, z+1)},
         };
 
-        int total = 0;
+        byte total = 0;
+        
         foreach(var pos in positions)
         {
             int _x = (int)pos.Value.x;
             int _z = (int)pos.Value.y;
 
-            bool add = true;
-            if (pos.Key == 1 && grid[_z+1, _x].Blocking || grid[_z, _x+1].Blocking) add = false;
-            if (pos.Key == 4 && grid[_z, _x-1].Blocking || grid[_z+1, _x].Blocking) add = false;
-            if (pos.Key == 32 && grid[_z-1, _x].Blocking || grid[_z, _x+1].Blocking) add = false;
-            if (pos.Key == 128 && grid[_z, _x-1].Blocking || grid[_z-1, _x].Blocking) add = false;
+            bool add = !grid[_z, _x].Blocking;
+            // only add corner to the calculation if they have 2 adjoining open tiles that are not blocking
+            if (pos.Key == 1 && add) add = (!grid[_z+1, _x].Blocking && !grid[_z, _x+1].Blocking);
+            if (pos.Key == 4 && add) add = (!grid[_z, _x-1].Blocking && !grid[_z+1, _x].Blocking);
+            if (pos.Key == 32 && add) add = (!grid[_z-1, _x].Blocking && !grid[_z, _x+1].Blocking);
+            if (pos.Key == 128 && add) add = (!grid[_z, _x-1].Blocking && !grid[_z-1, _x].Blocking);
             
-            if (add) total += pos.Key * getPosExponent(grid, _x, _z);
-            // tileCounter++;
+            if (add) total += (byte)pos.Key;
         }
         return total;
     }
