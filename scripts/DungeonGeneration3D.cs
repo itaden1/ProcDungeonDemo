@@ -35,6 +35,8 @@ public class DungeonGeneration3D : Spatial
         {
             {"pillar", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres")},
             {"floor", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/floor.tres")},
+            {"corridoorRoofEastWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofEastWest.tres")},
+            {"corridoorRoofNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofNorthSouth.tres")},
             {"wallEastWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallEastWest.tres")},
             {"wallNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallNorthSouth.tres")},
             {"skirtingNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingNorthSouth.tres")},
@@ -47,22 +49,22 @@ public class DungeonGeneration3D : Spatial
             { 0, new TestTileBuilder(TileSize, meshSet) },
             { 2, new TestTileBuilder(TileSize, meshSet) },
             { 8, new TestTileBuilder(TileSize, meshSet) },
-            { 10, new TestTileBuilder(TileSize, meshSet) },
+            { 10, new CorridoorCornerSouthEastBuilder(TileSize, meshSet) },
             { 11, new CornerSouthEastBuilder3D(TileSize, meshSet) },
             { 16, new TestTileBuilder(TileSize, meshSet) },
-            { 18, new TestTileBuilder(TileSize, meshSet) },
+            { 18, new CorridoorCornerSouthWestBuilder(TileSize, meshSet) },
             { 22, new CornerSouthWestBuilder3D(TileSize, meshSet) },
-            { 24, new TestTileBuilder(TileSize, meshSet) },
+            { 24, new CorridoorEastWestBuilder(TileSize, meshSet) },
             { 26, new TestTileBuilder(TileSize, meshSet) },
             { 27, new TestTileBuilder(TileSize, meshSet) },
             { 30, new TestTileBuilder(TileSize, meshSet) },
             { 31, new SouthWallBuilder3D(TileSize, meshSet) },
             { 64, new TestTileBuilder(TileSize, meshSet) },
-            { 66, new TestTileBuilder(TileSize, meshSet) },
-            { 72, new TestTileBuilder(TileSize, meshSet) },
+            { 66, new CorridoorNorthSouthBuilder(TileSize, meshSet) },
+            { 72, new CorridoorCornerNorthEastBuilder(TileSize, meshSet) },
             { 74, new TestTileBuilder(TileSize, meshSet) },
             { 75, new TestTileBuilder(TileSize, meshSet) },
-            { 80, new TestTileBuilder(TileSize, meshSet) },
+            { 80, new CorridoorCornerNorthWestBuilder(TileSize, meshSet) },
             { 82, new TestTileBuilder(TileSize, meshSet) },
             { 86, new TestTileBuilder(TileSize, meshSet) },
             { 88, new TestTileBuilder(TileSize, meshSet) },
@@ -90,7 +92,7 @@ public class DungeonGeneration3D : Spatial
             { 250, new TestTileBuilder(TileSize, meshSet) },
             { 251, new TestTileBuilder(TileSize, meshSet) },
             { 254, new TestTileBuilder(TileSize, meshSet) },
-            { 255, new TestTileBuilder(TileSize, meshSet) }
+            { 255, new OpenAreaBuilder3D(TileSize, meshSet) }
         };
 
         SurfaceTool st = new SurfaceTool();

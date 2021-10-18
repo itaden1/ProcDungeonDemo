@@ -150,4 +150,135 @@ namespace ProcDungeon.TileBuilders
             st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
         }
     }
+    public class OpenAreaBuilder3D: TileBuilderBase
+    {
+        public OpenAreaBuilder3D(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build an apen area with no walls
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize * 2, z * _tileSize)));
+        }
+    }
+    public class CorridoorEastWestBuilder: TileBuilderBase
+    {
+        public CorridoorEastWestBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+            Mesh corridoorRoof = _meshSet["corridoorRoofEastWest"];
+
+            // Build a corridoor spanning east to west
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(corridoorRoof, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize + _tileSize)));
+        }
+    }
+    public class CorridoorNorthSouthBuilder: TileBuilderBase
+    {
+        public CorridoorNorthSouthBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh corridoorRoof = _meshSet["corridoorRoofNorthSouth"];
+
+            // Build a corridoor spanning north to south
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(corridoorRoof, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class CorridoorCornerSouthEastBuilder: TileBuilderBase
+    {
+        public CorridoorCornerSouthEastBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corridoor corridoor on the to south east corner
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize  + _tileSize)));
+        }
+    }
+    public class CorridoorCornerSouthWestBuilder: TileBuilderBase
+    {
+        public CorridoorCornerSouthWestBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corridoor corridoor on the south west corner
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize  + _tileSize)));
+        }
+    }
+    public class CorridoorCornerNorthWestBuilder: TileBuilderBase
+    {
+        public CorridoorCornerNorthWestBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corridoor corridoor on the north west corner
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
+    public class CorridoorCornerNorthEastBuilder: TileBuilderBase
+    {
+        public CorridoorCornerNorthEastBuilder(int tileSize, Dictionary<string, Mesh> meshSet) : base(tileSize, meshSet)
+        {
+        }
+
+        public override void Build(SurfaceTool st, int x, int z)
+        {        
+            Mesh floor = _meshSet["floor"];
+            Mesh wallNorthSouth = _meshSet["wallNorthSouth"];
+            Mesh wallEastWest = _meshSet["wallEastWest"];
+
+            // Build a corridoor corridoor on the north east corner
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(floor, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, _tileSize, z * _tileSize)));
+            st.AppendFrom(wallNorthSouth, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize + _tileSize, 0, z * _tileSize)));
+            st.AppendFrom(wallEastWest, 0, new Transform(Basis.Identity, new Vector3(x * _tileSize, 0, z * _tileSize)));
+        }
+    }
 }
