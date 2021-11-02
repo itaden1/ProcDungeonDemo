@@ -1,9 +1,7 @@
 using Godot;
-using System;
 using System.Collections.Generic;
 
 using ProcDungeon.Structures;
-using ProcDungeon.Algorythms;
 using ProcDungeon;
 
 using ProcDungeon.TileBuilders;
@@ -35,8 +33,17 @@ public class DungeonGeneration3D : Spatial
         {
             {"pillar", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/pillar.tres")},
             {"floor", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/floor.tres")},
+
+            {"doorwayNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/doorwayNorthSouth.tres")},
+            {"doorwayEastWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/doorwayEastWest.tres")},
+
             {"corridoorRoofEastWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofEastWest.tres")},
             {"corridoorRoofNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofNorthSouth.tres")},
+            {"corridoorRoofCornerSouthEast", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofCornerSouthEast.tres")},
+            {"corridoorRoofCornerSouthWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofCornerSouthWest.tres")},
+            {"corridoorRoofCornerNorthEast", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofCornerNorthEast.tres")},
+            {"corridoorRoofCornerNorthWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/corridoorRoofCornerNorthWest.tres")},
+
             {"wallEastWest", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallEastWest.tres")},
             {"wallNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/wallNorthSouth.tres")},
             {"skirtingNorthSouth", (Mesh)ResourceLoader.Load<Mesh>("res://3DPrefabs/skirtingNorthSouth.tres")},
@@ -77,7 +84,7 @@ public class DungeonGeneration3D : Spatial
             { 107, new EastWallBuilder3D(TileSize, meshSet) },
             { 120, new TestTileBuilder(TileSize, meshSet) },
             { 122, new TestTileBuilder(TileSize, meshSet) },
-            { 123, new TestTileBuilder(TileSize, meshSet) },
+            { 123, new doorwayEastBuilder(TileSize, meshSet) },
             { 126, new TestTileBuilder(TileSize, meshSet) },
             { 127, new TestTileBuilder(TileSize, meshSet) },
             { 208, new CornerNorthWestBuilder3D(TileSize, meshSet) },
@@ -114,8 +121,9 @@ public class DungeonGeneration3D : Spatial
                     }
                     else GD.Print($"Missing key: {mask}");
 
-                    
-                    if(!_playerSpawned){
+
+                    if (!_playerSpawned)
+                    {
                         SpawnPlayer(x, z);
                     }
                 }
@@ -153,19 +161,19 @@ public class DungeonGeneration3D : Spatial
         };
 
         byte total = 0;
-        
-        foreach(var pos in positions)
+
+        foreach (var pos in positions)
         {
             int _x = (int)pos.Value.x;
             int _z = (int)pos.Value.y;
 
             bool add = !grid[_z, _x].Blocking;
             // only add corner to the calculation if they have 2 adjoining open tiles that are not blocking
-            if (pos.Key == 1 && add) add = (!grid[_z+1, _x].Blocking && !grid[_z, _x+1].Blocking);
-            if (pos.Key == 4 && add) add = (!grid[_z, _x-1].Blocking && !grid[_z+1, _x].Blocking);
-            if (pos.Key == 32 && add) add = (!grid[_z-1, _x].Blocking && !grid[_z, _x+1].Blocking);
-            if (pos.Key == 128 && add) add = (!grid[_z, _x-1].Blocking && !grid[_z-1, _x].Blocking);
-            
+            if (pos.Key == 1 && add) add = (!grid[_z + 1, _x].Blocking && !grid[_z, _x + 1].Blocking);
+            if (pos.Key == 4 && add) add = (!grid[_z, _x - 1].Blocking && !grid[_z + 1, _x].Blocking);
+            if (pos.Key == 32 && add) add = (!grid[_z - 1, _x].Blocking && !grid[_z, _x + 1].Blocking);
+            if (pos.Key == 128 && add) add = (!grid[_z, _x - 1].Blocking && !grid[_z - 1, _x].Blocking);
+
             if (add) total += (byte)pos.Key;
         }
         return total;
