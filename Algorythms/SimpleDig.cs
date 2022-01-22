@@ -118,24 +118,28 @@ namespace GamePasta.DungeonAlgorythms
             }
             // fill empty space with chambers
             Rect chamber = new Rect(0, 0, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
-            bool placeable = true;
+            bool placeable = false;
             List<Rect> blockages = new List<Rect>();
             blockages.AddRange(corridoors);
             blockages.AddRange(rects);
 
-            for (int x = 10; x < _gridSize.X; x++)
+            for (int x = 1; x < _gridSize.X; x++)
             {
-                for (int y = 10; y < _gridSize.Y; y++)
+                for (int y = 1; y < _gridSize.Y; y++)
                 {
                     Rect potentialChamber = new Rect(x, y, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
                     Rect margin = potentialChamber.Expand(1);
                     Godot.GD.Print(potentialChamber.Start.X);
                     foreach (Rect b in blockages)
                     {
-                        if (margin.Intersects(b))
+                        if (margin.Intersects(b) || margin.End.X > _gridSize.X || margin.End.Y > _gridSize.Y)
                         {
                             placeable = false;
                             break;
+                        }
+                        else
+                        {
+                            placeable = true;
                         }
                     }
                     if (placeable)
