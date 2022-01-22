@@ -94,7 +94,7 @@ namespace GamePasta.DungeonAlgorythms
         private bool NotOutOfBounds(Vector2 vec)
         {
             bool notUnderBounds = (vec.X >= 0 && vec.Y >= 0);
-            bool notOverbounds = (vec.X < _gridSize.X && vec.Y < _gridSize.Y);
+            bool notOverbounds = (vec.X < _gridSize.X - 1 && vec.Y < _gridSize.Y - 1);
             return (notOverbounds && notUnderBounds);
         }
 

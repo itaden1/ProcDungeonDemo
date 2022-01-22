@@ -37,18 +37,21 @@ public class DungeonGeneration2D : TileMap
             Direction.WEST,
             0
         );
-        // var alg = new BSPDungeonAlgorythm(_roomCount);
-        // var myMap = new DungeonGrid(_mapSize, alg);
-        // myMap.GenerateLayout();
 
-        List<System.Numerics.Vector2> path = alg.Execute();
+        SimpleDig alg2 = new SimpleDig(
+            new System.Numerics.Vector2(_mapSize, _mapSize),
+            start,
+            new System.Numerics.Vector2(6, 6),
+            _roomCount
+        );
+
+        List<System.Numerics.Vector2> path = alg2.Execute();
         int[] tiles = new int[]{
             TileSet.FindTileByName("wall_1"),
             TileSet.FindTileByName("wall_2"),
             TileSet.FindTileByName("wall_3"),
         };
 
-        GD.Print(path.Count);
         for (int i = 0; i < _mapSize - 1; i++)
         {
             for (int j = 0; j < _mapSize - 1; j++)

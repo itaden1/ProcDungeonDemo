@@ -11,7 +11,7 @@ config_version=4
 [application]
 
 config/name="ProcDungeon"
-run/main_scene="res://DungeonGeneration3D.tscn"
+run/main_scene="res://DungeonGeneration2D.tscn"
 config/icon="res://icon.png"
 
 [display]
