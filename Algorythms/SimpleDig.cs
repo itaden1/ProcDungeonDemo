@@ -146,16 +146,35 @@ namespace GamePasta.DungeonAlgorythms
                     }
                     if (placeable)
                     {
+                        bool canAdd = false;
                         chamber = new Rect(potentialChamber.Start, potentialChamber.Size);
-                        potentialChambers.Add(chamber);
+                        // dont overlap exisitng chambers
+                        if (potentialChambers.Count >= 1)
+                        {
+                            foreach (Rect pc in potentialChambers)
+                            {
+                                Rect pcMargin = pc.Expand(1);
+                                if (!potentialChamber.Intersects(pcMargin))
+                                {
+                                    canAdd = true;
+                                }
+                                else
+                                {
+                                    canAdd = false;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            canAdd = true;
+                        }
+                        if (canAdd)
+                        {
+                            potentialChambers.Add(chamber);
+                        }
 
                     }
                 }
-                // if (placeable)
-                // {
-                //     potentialChambers.Add(chamber);
-
-                // };
             }
 
 

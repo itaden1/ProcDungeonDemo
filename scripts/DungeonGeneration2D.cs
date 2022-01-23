@@ -30,13 +30,17 @@ public class DungeonGeneration2D : TileMap
 
         System.Numerics.Vector2 start = new System.Numerics.Vector2(0, (int)_mapSize / 2);
 
+
+
         RandomWalk alg = new RandomWalk(
-            new System.Numerics.Vector2(_mapSize, _mapSize),
+            new System.Numerics.Vector2(3, 3),
             start,
             new List<System.Numerics.Vector2>(),
             Direction.EAST,
             0
         );
+
+        List<System.Numerics.Vector2> map = alg.Execute();
 
         SimpleDig alg2 = new SimpleDig(
             new System.Numerics.Vector2(_mapSize, _mapSize),
