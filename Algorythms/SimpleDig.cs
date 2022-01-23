@@ -64,14 +64,16 @@ namespace GamePasta.DungeonAlgorythms
         private int _maxSteps;
         private Direction _direction;
         private Vector2 _maxRoomSize;
+        private int _maxChambers;
         private List<Rect> _rooms = new List<Rect>();
         private Dictionary<Direction, Vector2> _directionMap;
-        public SimpleDig(Vector2 gridSize, Vector2 start, Vector2 maxRoomSize, int maxSteps)
+        public SimpleDig(Vector2 gridSize, Vector2 start, Vector2 maxRoomSize, int maxChambers, int maxSteps)
         {
             _gridSize = gridSize;
             _start = start;
             _maxRoomSize = maxRoomSize;
             _maxSteps = maxSteps;
+            _maxChambers = maxChambers;
         }
 
         public List<Vector2> Execute()
@@ -118,6 +120,7 @@ namespace GamePasta.DungeonAlgorythms
             }
             // fill empty space with chambers
             Rect chamber = new Rect(0, 0, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
+            List<Rect> potentialChambers = new List<Rect>();
             bool placeable = false;
             List<Rect> blockages = new List<Rect>();
             blockages.AddRange(corridoors);
@@ -129,7 +132,6 @@ namespace GamePasta.DungeonAlgorythms
                 {
                     Rect potentialChamber = new Rect(x, y, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
                     Rect margin = potentialChamber.Expand(1);
-                    Godot.GD.Print(potentialChamber.Start.X);
                     foreach (Rect b in blockages)
                     {
                         if (margin.Intersects(b) || margin.End.X > _gridSize.X || margin.End.Y > _gridSize.Y)
@@ -145,16 +147,84 @@ namespace GamePasta.DungeonAlgorythms
                     if (placeable)
                     {
                         chamber = new Rect(potentialChamber.Start, potentialChamber.Size);
-                        break;
+                        potentialChambers.Add(chamber);
+
                     }
                 }
-                if (placeable) break;
+                // if (placeable)
+                // {
+                //     potentialChambers.Add(chamber);
+
+                // };
             }
-            if (placeable)
+
+
+            List<Vector2> validPathNodes = new List<Vector2>();
+            List<Rect> validChambers = new List<Rect>();
+
+
+            foreach (Vector2 p in path)
             {
-                _rooms.Add(chamber);
-                path.AddRange(chamber.ToList());
-                rects.Add(chamber);
+
+
+                List<Vector2> directions = new List<Vector2>();
+                directions.Add(new Vector2(p.X, p.Y - 5)); // north
+                directions.Add(new Vector2(p.X, p.Y + 5)); // south
+                directions.Add(new Vector2(p.X + 5, p.Y)); // east
+                directions.Add(new Vector2(p.X - 5, p.Y)); // west
+
+                foreach (Vector2 d in directions)
+                {
+                    foreach (Rect c in potentialChambers)
+                    {
+
+                        if (c.Intersects(new Rect(d, new Vector2(3, 3))))
+                        {
+                            validPathNodes.Add(p);
+                            validChambers.Add(c);
+                            break;
+                        }
+                    }
+                }
+            }
+            Godot.GD.Print(validChambers.Count);
+            Godot.GD.Print(validPathNodes.Count);
+            Godot.GD.Print("***");
+
+
+            for (int i = 0; i < _maxChambers * 100; i++)
+            {
+                Vector2 nodeChoice;
+                if (validPathNodes.Count > 1)
+                {
+                    nodeChoice = validPathNodes[rand.Next(0, validPathNodes.Count - 1)];
+                }
+                else if (validPathNodes.Count == 1)
+                {
+                    nodeChoice = validPathNodes[0];
+                }
+                else break;
+
+                List<Vector2> directions = new List<Vector2>();
+                directions.Add(new Vector2(nodeChoice.X, nodeChoice.Y - 1)); // north
+                directions.Add(new Vector2(nodeChoice.X, nodeChoice.Y + 1)); // south
+                directions.Add(new Vector2(nodeChoice.X + 1, nodeChoice.Y)); // east
+                directions.Add(new Vector2(nodeChoice.X - 1, nodeChoice.Y)); // west
+
+                foreach (Vector2 d in directions)
+                {
+                    foreach (Rect c in validChambers)
+                    {
+                        if (c.Intersects(new Rect(d, new Vector2(3, 3))))
+                        {
+                            _rooms.Add(c);
+                            path.AddRange(c.ToList());
+                            rects.Add(c);
+                            break;
+                        }
+                    }
+                }
+                validPathNodes.Remove(nodeChoice);
             }
 
             return path;

@@ -34,14 +34,15 @@ public class DungeonGeneration2D : TileMap
             new System.Numerics.Vector2(_mapSize, _mapSize),
             start,
             new List<System.Numerics.Vector2>(),
-            Direction.WEST,
+            Direction.EAST,
             0
         );
 
         SimpleDig alg2 = new SimpleDig(
             new System.Numerics.Vector2(_mapSize, _mapSize),
             start,
-            new System.Numerics.Vector2(6, 6),
+            new System.Numerics.Vector2(3, 3),
+            10,
             _roomCount
         );
 

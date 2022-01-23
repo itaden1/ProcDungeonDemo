@@ -33,8 +33,8 @@ namespace GamePasta.DungeonAlgorythms
             {
                 {Direction.NORTH, new Vector2(0, -1)},
                 {Direction.SOUTH, new Vector2(0, 1)},
-                {Direction.EAST, new Vector2(-1, 0)},
-                {Direction.WEST, new Vector2(1, 0)}
+                {Direction.EAST, new Vector2(1, 0)},
+                {Direction.WEST, new Vector2(-1, 0)}
             };
         }
         public List<Vector2> Execute()
