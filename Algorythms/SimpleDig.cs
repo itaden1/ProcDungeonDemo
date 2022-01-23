@@ -84,11 +84,12 @@ namespace GamePasta.DungeonAlgorythms
             List<Rect> rects = new List<Rect>();
             List<Rect> corridoors = new List<Rect>();
 
+            int threshold = 1000;
             while (rects.Count < _maxSteps)
             {
                 // create a rect
-                int width = rand.Next(1, (int)_maxRoomSize.X);
-                int height = rand.Next(1, (int)_maxRoomSize.Y);
+                int width = rand.Next(2, (int)_maxRoomSize.X);
+                int height = rand.Next(2, (int)_maxRoomSize.Y);
                 int positionX = rand.Next(0, (int)_gridSize.X - width);
                 int positionY = rand.Next(0, (int)_gridSize.Y - height);
 
@@ -117,66 +118,52 @@ namespace GamePasta.DungeonAlgorythms
                     }
                     rects.Add(rect);
                 }
+                threshold--;
+                if (threshold <= 0) break;
             }
+
             // fill empty space with chambers
-            Rect chamber = new Rect(0, 0, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
             List<Rect> potentialChambers = new List<Rect>();
-            bool placeable = false;
             List<Rect> blockages = new List<Rect>();
             blockages.AddRange(corridoors);
             blockages.AddRange(rects);
 
-            for (int x = 1; x < _gridSize.X; x++)
+            Vector2 size = new Vector2(_maxRoomSize.X, _maxRoomSize.Y);
+
+            while (potentialChambers.Count <= _maxChambers)
             {
-                for (int y = 1; y < _gridSize.Y; y++)
+                for (int x = 1; x < _gridSize.X; x++)
                 {
-                    Rect potentialChamber = new Rect(x, y, (int)_maxRoomSize.X, (int)_maxRoomSize.Y);
-                    Rect margin = potentialChamber.Expand(1);
-                    foreach (Rect b in blockages)
+                    bool placeable = true;
+
+                    for (int y = 1; y < _gridSize.Y; y++)
                     {
-                        if (margin.Intersects(b) || margin.End.X > _gridSize.X || margin.End.Y > _gridSize.Y)
+
+                        Rect potentialChamber = new Rect(x, y, (int)size.X, (int)size.Y);
+                        Rect margin = potentialChamber.Expand(1);
+                        placeable = true;
+
+                        foreach (Rect b in blockages)
                         {
-                            placeable = false;
-                            break;
-                        }
-                        else
-                        {
-                            placeable = true;
-                        }
-                    }
-                    if (placeable)
-                    {
-                        bool canAdd = false;
-                        chamber = new Rect(potentialChamber.Start, potentialChamber.Size);
-                        // dont overlap exisitng chambers
-                        if (potentialChambers.Count >= 1)
-                        {
-                            foreach (Rect pc in potentialChambers)
+
+                            if (margin.Intersects(b) || margin.End.X > _gridSize.X || margin.End.Y > _gridSize.Y)
                             {
-                                Rect pcMargin = pc.Expand(1);
-                                if (!potentialChamber.Intersects(pcMargin))
-                                {
-                                    canAdd = true;
-                                }
-                                else
-                                {
-                                    canAdd = false;
-                                }
+                                placeable = false;
+                                break;
                             }
                         }
-                        else
+                        if (placeable)
                         {
-                            canAdd = true;
+                            blockages.Add(potentialChamber);
+                            potentialChambers.Add(potentialChamber);
+                            break;
                         }
-                        if (canAdd)
-                        {
-                            potentialChambers.Add(chamber);
-                        }
-
                     }
                 }
+                size.X--;
+                size.Y--;
+                if (size.X < 1 || size.Y < 1) break;
             }
-
 
             List<Vector2> validPathNodes = new List<Vector2>();
             List<Rect> validChambers = new List<Rect>();
@@ -184,20 +171,18 @@ namespace GamePasta.DungeonAlgorythms
 
             foreach (Vector2 p in path)
             {
-
-
                 List<Vector2> directions = new List<Vector2>();
-                directions.Add(new Vector2(p.X, p.Y - 5)); // north
-                directions.Add(new Vector2(p.X, p.Y + 5)); // south
-                directions.Add(new Vector2(p.X + 5, p.Y)); // east
-                directions.Add(new Vector2(p.X - 5, p.Y)); // west
+                directions.Add(new Vector2(p.X, p.Y - 2)); // north
+                directions.Add(new Vector2(p.X, p.Y + 2)); // south
+                directions.Add(new Vector2(p.X - 2, p.Y)); // west
+                directions.Add(new Vector2(p.X + 2, p.Y)); // east
 
                 foreach (Vector2 d in directions)
                 {
                     foreach (Rect c in potentialChambers)
                     {
 
-                        if (c.Intersects(new Rect(d, new Vector2(3, 3))))
+                        if (c.Intersects(new Rect(d, new Vector2(1, 1))))
                         {
                             validPathNodes.Add(p);
                             validChambers.Add(c);
@@ -206,12 +191,8 @@ namespace GamePasta.DungeonAlgorythms
                     }
                 }
             }
-            Godot.GD.Print(validChambers.Count);
-            Godot.GD.Print(validPathNodes.Count);
-            Godot.GD.Print("***");
 
-
-            for (int i = 0; i < _maxChambers * 100; i++)
+            for (int i = 0; i < _maxChambers; i++)
             {
                 Vector2 nodeChoice;
                 if (validPathNodes.Count > 1)
@@ -227,20 +208,25 @@ namespace GamePasta.DungeonAlgorythms
                 List<Vector2> directions = new List<Vector2>();
                 directions.Add(new Vector2(nodeChoice.X, nodeChoice.Y - 1)); // north
                 directions.Add(new Vector2(nodeChoice.X, nodeChoice.Y + 1)); // south
-                directions.Add(new Vector2(nodeChoice.X + 1, nodeChoice.Y)); // east
                 directions.Add(new Vector2(nodeChoice.X - 1, nodeChoice.Y)); // west
+                directions.Add(new Vector2(nodeChoice.X + 1, nodeChoice.Y)); // east
 
-                foreach (Vector2 d in directions)
+
+                Vector2 dChoice = directions[rand.Next(0, directions.Count - 1)];
+
+                foreach (Rect c in validChambers)
                 {
-                    foreach (Rect c in validChambers)
+                    if (c.Intersects(new Rect(dChoice, new Vector2(3, 3))))
                     {
-                        if (c.Intersects(new Rect(d, new Vector2(3, 3))))
+                        List<Rect> connectors = CreateCorridoor(c, new Rect(dChoice, new Vector2(1, 1)));
+                        _rooms.Add(c);
+                        path.AddRange(c.ToList());
+                        foreach (Rect conn in connectors)
                         {
-                            _rooms.Add(c);
-                            path.AddRange(c.ToList());
-                            rects.Add(c);
-                            break;
+                            path.AddRange(conn.ToList());
                         }
+                        rects.Add(c);
+                        break;
                     }
                 }
                 validPathNodes.Remove(nodeChoice);

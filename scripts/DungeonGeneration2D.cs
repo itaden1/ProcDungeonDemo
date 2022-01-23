@@ -10,10 +10,10 @@ using GamePasta.DungeonAlgorythms;
 public class DungeonGeneration2D : TileMap
 {
     [Export]
-    private int _mapSize = 40;
+    private int _mapSize = 20;
 
     [Export]
-    private int _roomCount = 20;
+    private int _roomCount = 8;
     private enum _tileType { WALL, FLOOR }
     private Random _random = new Random();
 
@@ -45,7 +45,7 @@ public class DungeonGeneration2D : TileMap
         SimpleDig alg2 = new SimpleDig(
             new System.Numerics.Vector2(_mapSize, _mapSize),
             start,
-            new System.Numerics.Vector2(3, 3),
+            new System.Numerics.Vector2(5, 5),
             10,
             _roomCount
         );
