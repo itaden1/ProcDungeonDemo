@@ -33,7 +33,7 @@ public class DungeonGeneration2D : TileMap
 
 
         RandomWalk alg = new RandomWalk(
-            new System.Numerics.Vector2(3, 3),
+            new System.Numerics.Vector2(2, 2),
             start,
             new List<System.Numerics.Vector2>(),
             Direction.EAST,
@@ -41,16 +41,25 @@ public class DungeonGeneration2D : TileMap
         );
 
         List<System.Numerics.Vector2> map = alg.Execute();
+        List<System.Numerics.Vector2> path = new List<System.Numerics.Vector2>();
+        foreach (System.Numerics.Vector2 vec in map)
+        {
+            SimpleDig alg2 = new SimpleDig(
+                new System.Numerics.Vector2(_mapSize / 2, _mapSize / 2),
+                start,
+                new System.Numerics.Vector2(5, 5),
+                10,
+                _roomCount
+            );
+            var items = alg2.Execute();
+            foreach (System.Numerics.Vector2 p in items)
+            {
+                // TODO create an offset
+                path.Add(p);
+            }
+        }
 
-        SimpleDig alg2 = new SimpleDig(
-            new System.Numerics.Vector2(_mapSize, _mapSize),
-            start,
-            new System.Numerics.Vector2(5, 5),
-            10,
-            _roomCount
-        );
-
-        List<System.Numerics.Vector2> path = alg2.Execute();
+        // List<System.Numerics.Vector2> path = alg2.Execute();
         int[] tiles = new int[]{
             TileSet.FindTileByName("wall_1"),
             TileSet.FindTileByName("wall_2"),
