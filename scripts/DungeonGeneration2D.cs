@@ -10,7 +10,7 @@ using GamePasta.DungeonAlgorythms;
 public class DungeonGeneration2D : TileMap
 {
     [Export]
-    private int _mapSize = 20;
+    private int _mapSize = 40;
 
     [Export]
     private int _roomCount = 8;
@@ -28,12 +28,12 @@ public class DungeonGeneration2D : TileMap
         Clear();
         // Build a random dungeon
 
-        System.Numerics.Vector2 start = new System.Numerics.Vector2(0, (int)_mapSize / 2);
+        System.Numerics.Vector2 start = new System.Numerics.Vector2(0, 1);
 
 
 
         RandomWalk alg = new RandomWalk(
-            new System.Numerics.Vector2(2, 2),
+            new System.Numerics.Vector2(5, 5),
             start,
             new List<System.Numerics.Vector2>(),
             Direction.EAST,
@@ -41,21 +41,39 @@ public class DungeonGeneration2D : TileMap
         );
 
         List<System.Numerics.Vector2> map = alg.Execute();
+
         List<System.Numerics.Vector2> path = new List<System.Numerics.Vector2>();
+        List<System.Numerics.Vector2> prevItems = new List<System.Numerics.Vector2>();
         foreach (System.Numerics.Vector2 vec in map)
         {
             SimpleDig alg2 = new SimpleDig(
-                new System.Numerics.Vector2(_mapSize / 2, _mapSize / 2),
+                new System.Numerics.Vector2(_mapSize / 4, _mapSize / 4),
                 start,
                 new System.Numerics.Vector2(5, 5),
-                10,
+                6,
                 _roomCount
             );
+
+
             var items = alg2.Execute();
+            if (prevItems.Count > 0)
+            {
+                // TODO need to do offset here as well
+                List<Rect> corrs = SimpleConnector.CreateCorridoor(
+                    new Rect((int)items[0].X, (int)items[0].Y, 2, 2),
+                    new Rect((int)prevItems[prevItems.Count - 1].X, (int)prevItems[prevItems.Count - 1].Y, 2, 2)
+                );
+                foreach (Rect c in corrs)
+                {
+                    items.AddRange(c.ToList());
+                }
+
+            }
+            prevItems = items;
+
             foreach (System.Numerics.Vector2 p in items)
             {
-                // TODO create an offset
-                path.Add(p);
+                path.Add(new System.Numerics.Vector2(p.X + (_mapSize / 4 * vec.X), p.Y + (_mapSize / 4 * vec.Y)));
             }
         }
 
