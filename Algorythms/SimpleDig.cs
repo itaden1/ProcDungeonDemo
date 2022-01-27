@@ -84,6 +84,7 @@ namespace GamePasta.DungeonAlgorythms
             List<Rect> rects = new List<Rect>();
             List<Rect> corridoors = new List<Rect>();
 
+            rects.Add(new Rect((int)_start.X, (int)_start.Y, 2, 2));
             int threshold = 1000;
             while (rects.Count < _maxSteps)
             {

@@ -47,7 +47,7 @@ public class DungeonGeneration2D : TileMap
         foreach (System.Numerics.Vector2 vec in map)
         {
             SimpleDig alg2 = new SimpleDig(
-                new System.Numerics.Vector2(_mapSize / 4, _mapSize / 4),
+                new System.Numerics.Vector2(_mapSize / 4 - 2, _mapSize / 4 - 2),
                 start,
                 new System.Numerics.Vector2(5, 5),
                 6,
@@ -56,12 +56,51 @@ public class DungeonGeneration2D : TileMap
 
 
             var items = alg2.Execute();
-            if (prevItems.Count > 0)
+
+            // create an exit tile
+            int nextMapTileIndex = map.FindIndex(item => item == vec) + 1;
+            if (nextMapTileIndex < map.Count)
             {
-                // TODO need to do offset here as well
+                System.Numerics.Vector2 nextMapTile = new System.Numerics.Vector2(map[nextMapTileIndex].X, map[nextMapTileIndex].Y);
+                System.Numerics.Vector2 exitVector = new System.Numerics.Vector2();
+
+                if (nextMapTile.X > vec.X) // direction is east
+                {
+                    int yPos = _random.Next(2, (_mapSize / 4) - 2);
+
+                    exitVector = new System.Numerics.Vector2(_mapSize / 4, yPos);
+                    start = new System.Numerics.Vector2(0, yPos);
+                }
+                else if (nextMapTile.Y > vec.Y) // direction is south
+                {
+                    int xPos = _random.Next(2, (_mapSize / 4) - 2);
+
+                    exitVector = new System.Numerics.Vector2(xPos, _mapSize / 4);
+                    start = new System.Numerics.Vector2(xPos, 0);
+
+                }
+                else if (nextMapTile.Y < vec.Y) // north
+                {
+                    int xPos = _random.Next(2, (_mapSize / 4) - 2);
+
+                    exitVector = new System.Numerics.Vector2(xPos, 0);
+                    start = new System.Numerics.Vector2(xPos, _mapSize / 4);
+
+                }
+                else if (nextMapTile.X < vec.X) // west
+                {
+                    int yPos = _random.Next(2, (_mapSize / 4) - 2);
+                    exitVector = new System.Numerics.Vector2(0, yPos);
+                    start = new System.Numerics.Vector2(_mapSize / 4, yPos);
+                }
+
+                System.Numerics.Vector2 prevVector = GetClosestVector(exitVector, items);
+                GD.Print($"{exitVector.X}:{exitVector.Y}");
+                items.Add(exitVector);
+
                 List<Rect> corrs = SimpleConnector.CreateCorridoor(
-                    new Rect((int)items[0].X, (int)items[0].Y, 2, 2),
-                    new Rect((int)prevItems[prevItems.Count - 1].X, (int)prevItems[prevItems.Count - 1].Y, 2, 2)
+                    new Rect((int)exitVector.X, (int)exitVector.Y, 2, 2),
+                    new Rect((int)prevVector.X, (int)prevVector.Y, 2, 2)
                 );
                 foreach (Rect c in corrs)
                 {
@@ -69,6 +108,7 @@ public class DungeonGeneration2D : TileMap
                 }
 
             }
+
             prevItems = items;
 
             foreach (System.Numerics.Vector2 p in items)
@@ -84,9 +124,9 @@ public class DungeonGeneration2D : TileMap
             TileSet.FindTileByName("wall_3"),
         };
 
-        for (int i = 0; i < _mapSize - 1; i++)
+        for (int i = 0; i < _mapSize + 3; i++)
         {
-            for (int j = 0; j < _mapSize - 1; j++)
+            for (int j = 0; j < _mapSize + 3; j++)
             {
                 var tile = tiles[_random.Next(0, tiles.GetLength(0))];
                 SetCell(i, j, tile);
@@ -96,7 +136,7 @@ public class DungeonGeneration2D : TileMap
         foreach (System.Numerics.Vector2 vec in path)
         {
             // var tile = tiles[_random.Next(0, tiles.GetLength(0))];
-            SetCell((int)vec.X, (int)vec.Y, -1);
+            SetCell((int)vec.X + 1, (int)vec.Y + 1, -1);
         }
 
         // for(int y = 0; y < myMap.Grid.GetLength(0); y++)
@@ -113,6 +153,25 @@ public class DungeonGeneration2D : TileMap
         // 	}
         // }
     }
+
+    private System.Numerics.Vector2 GetClosestVector(System.Numerics.Vector2 vec, List<System.Numerics.Vector2> vectors)
+    {
+        if (vectors.Count <= 0) return vec;
+        System.Numerics.Vector2 closest = vectors[0];
+        foreach (System.Numerics.Vector2 vector in vectors)
+        {
+            float newDistX = Math.Abs(vec.X - vector.X);
+            float oldDistX = Math.Abs(vec.X - closest.X);
+            float newDistY = Math.Abs(vec.X - vector.X);
+            float oldDistY = Math.Abs(vec.X - closest.X);
+            if (newDistX + newDistY < oldDistX + oldDistY)
+            {
+                closest = vector;
+            }
+        }
+        return closest;
+    }
+
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
     {
         _roomCount = rooms;
