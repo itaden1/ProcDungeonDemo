@@ -6,7 +6,7 @@ namespace GamePasta.DungeonAlgorythms
 {
     public enum Direction
     {
-        NORTH, SOUTH, EAST, WEST
+        NORTH, SOUTH, EAST, WEST, NONE
     }
 
     public interface IRandomAlgorythm
@@ -34,7 +34,9 @@ namespace GamePasta.DungeonAlgorythms
                 {Direction.NORTH, new Vector2(0, -1)},
                 {Direction.SOUTH, new Vector2(0, 1)},
                 {Direction.EAST, new Vector2(1, 0)},
-                {Direction.WEST, new Vector2(-1, 0)}
+                {Direction.WEST, new Vector2(-1, 0)},
+                {Direction.NONE, new Vector2(0, 0)}
+
             };
         }
         public List<Vector2> Execute()
@@ -88,6 +90,7 @@ namespace GamePasta.DungeonAlgorythms
 
         private bool NotInWrongDirection(Vector2 vec, Vector2 current)
         {
+            if (_direction == Direction.NONE) return true;
             return (vec != new Vector2(current.X + _directionMap[_direction].X * -1, current.Y + _directionMap[_direction].Y * -1));
         }
 
