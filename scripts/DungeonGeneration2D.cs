@@ -30,10 +30,10 @@ public class DungeonGeneration2D : TileMap
 
         System.Numerics.Vector2 start = new System.Numerics.Vector2(0, 1);
 
-
+        int segments = 5;
 
         RandomWalk alg = new RandomWalk(
-            new System.Numerics.Vector2(5, 5),
+            new System.Numerics.Vector2(segments, segments),
             start,
             new List<System.Numerics.Vector2>(),
             Direction.EAST,
@@ -44,11 +44,13 @@ public class DungeonGeneration2D : TileMap
 
         List<System.Numerics.Vector2> path = new List<System.Numerics.Vector2>();
 
-        path.AddRange(DigPath(map));
+        path.AddRange(DigPath(map, new System.Numerics.Vector2(0, 0)));
 
 
         //loop through the map again and create secondary passages
-        List<List<System.Numerics.Vector2>> secondaryPaths = new List<List<System.Numerics.Vector2>>();
+        // List<List<System.Numerics.Vector2>> secondaryPaths = new List<List<System.Numerics.Vector2>>();
+
+        Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>> secondaryPaths = new Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>>();
 
         // add the current map to our mask to not overwrite existing vectors
         List<System.Numerics.Vector2> mask = new List<System.Numerics.Vector2>();
@@ -60,7 +62,7 @@ public class DungeonGeneration2D : TileMap
 
             // check that this tile has none blocking neighbours
             List<System.Numerics.Vector2> neighbours = new List<System.Numerics.Vector2>()
-                       {
+            {
                 // north
                 new System.Numerics.Vector2(vec.X, vec.Y-1),
                 // south
@@ -76,22 +78,15 @@ public class DungeonGeneration2D : TileMap
 
             foreach (var n in neighbours)
             {
+                // TODO make map size configurable
                 bool valid = true;
-                foreach (var m in mask)
-                {
-                    if (n.X == m.X && n.Y == m.Y)
-                    {
-                        valid = false;
-                        break;
-                    }
-                }
+                if (n.X < 0 || n.X >= segments - 1 || n.Y < 0 || n.Y >= segments - 1 || mask.Contains(n)) valid = false;
                 if (valid)
                 {
                     validNeighbours.Add(n);
                 }
             }
             if (validNeighbours.Count <= 0) continue;
-            GD.Print(validNeighbours.Count);
 
             // choose a none blocking neighbour
             System.Numerics.Vector2 neighbour;
@@ -108,22 +103,39 @@ public class DungeonGeneration2D : TileMap
 
             // TODO if neighbour is also neighbour to another main path tile roshambo
 
+            int roomCount = _random.Next(1, 3);
             // execute random walk on the neighbour
             RandomWalk alg3 = new RandomWalk(
                 new System.Numerics.Vector2(5, 5),
                 neighbour,
                 mask,
                 Direction.NONE,
-                3
+                roomCount
             );
             List<System.Numerics.Vector2> alg3Result = alg3.Execute();
-            secondaryPaths.Add(alg3Result);
+            // secondaryPaths.Add(alg3Result);
+            secondaryPaths[vec] = alg3Result;
             mask.AddRange(alg3Result);
         }
 
         foreach (var p in secondaryPaths)
         {
-            path.AddRange(DigPath(p));
+            Dictionary<string, System.Numerics.Vector2> entryExit = GetEntryExit(p.Value[0], p.Key);
+            System.Numerics.Vector2 exitVector = entryExit["exit"];
+
+            System.Numerics.Vector2 prevVector = GetClosestVector(exitVector, path);
+            Rect exitRoom = new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3);
+            path.AddRange(exitRoom.ToList());
+
+            List<Rect> corrs = SimpleConnector.CreateCorridoor(
+                exitRoom,
+                new Rect((int)prevVector.X, (int)prevVector.Y, 2, 2)
+            );
+            foreach (Rect c in corrs)
+            {
+                path.AddRange(c.ToList());
+            }
+            path.AddRange(DigPath(p.Value, entryExit["entry"]));
         }
         // List<System.Numerics.Vector2> path = alg2.Execute();
         int[] tiles = new int[]{
@@ -150,12 +162,46 @@ public class DungeonGeneration2D : TileMap
 
     }
 
-    private IEnumerable<System.Numerics.Vector2> DigPath(List<System.Numerics.Vector2> map)
+    private Dictionary<string, System.Numerics.Vector2> GetEntryExit(System.Numerics.Vector2 to, System.Numerics.Vector2 from)
+    {
+        Dictionary<string, System.Numerics.Vector2> results = new Dictionary<string, System.Numerics.Vector2>();
+        if (to.X > from.X) // direction is east
+        {
+            int yPos = _random.Next(2, (_mapSize / 4) - 1);
+
+            results["exit"] = new System.Numerics.Vector2(_mapSize / 4 - 1, yPos);
+            results["entry"] = new System.Numerics.Vector2(0, yPos);
+        }
+        else if (to.Y > from.Y) // direction is south
+        {
+            int xPos = _random.Next(2, (_mapSize / 4) - 1);
+
+            results["exit"] = new System.Numerics.Vector2(xPos, _mapSize / 4 - 1);
+            results["entry"] = new System.Numerics.Vector2(xPos, 0);
+
+        }
+        else if (to.Y < from.Y) // north
+        {
+            int xPos = _random.Next(2, (_mapSize / 4) - 1);
+
+            results["exit"] = new System.Numerics.Vector2(xPos, 0);
+            results["entry"] = new System.Numerics.Vector2(xPos, _mapSize / 4 - 1);
+
+        }
+        else if (to.X < from.X) // west
+        {
+            int yPos = _random.Next(2, (_mapSize / 4) - 1);
+            results["exit"] = new System.Numerics.Vector2(0, yPos);
+            results["entry"] = new System.Numerics.Vector2(_mapSize / 4 - 2, yPos);
+        }
+        return results;
+    }
+
+    private IEnumerable<System.Numerics.Vector2> DigPath(List<System.Numerics.Vector2> map, System.Numerics.Vector2 start)
     {
         List<System.Numerics.Vector2> prevItems = new List<System.Numerics.Vector2>();
         List<System.Numerics.Vector2> returnItems = new List<System.Numerics.Vector2>();
 
-        System.Numerics.Vector2 start = new System.Numerics.Vector2(0, 0);
         foreach (System.Numerics.Vector2 vec in map)
         {
             SimpleDig alg2 = new SimpleDig(
@@ -175,36 +221,9 @@ public class DungeonGeneration2D : TileMap
             {
                 System.Numerics.Vector2 nextMapTile = new System.Numerics.Vector2(map[nextMapTileIndex].X, map[nextMapTileIndex].Y);
                 System.Numerics.Vector2 exitVector = new System.Numerics.Vector2();
-
-                if (nextMapTile.X > vec.X) // direction is east
-                {
-                    int yPos = _random.Next(2, (_mapSize / 4) - 2);
-
-                    exitVector = new System.Numerics.Vector2(_mapSize / 4 - 2, yPos);
-                    start = new System.Numerics.Vector2(0, yPos);
-                }
-                else if (nextMapTile.Y > vec.Y) // direction is south
-                {
-                    int xPos = _random.Next(2, (_mapSize / 4) - 2);
-
-                    exitVector = new System.Numerics.Vector2(xPos, _mapSize / 4 - 2);
-                    start = new System.Numerics.Vector2(xPos, 0);
-
-                }
-                else if (nextMapTile.Y < vec.Y) // north
-                {
-                    int xPos = _random.Next(2, (_mapSize / 4) - 2);
-
-                    exitVector = new System.Numerics.Vector2(xPos, 0);
-                    start = new System.Numerics.Vector2(xPos, _mapSize / 4 - 2);
-
-                }
-                else if (nextMapTile.X < vec.X) // west
-                {
-                    int yPos = _random.Next(2, (_mapSize / 4) - 2);
-                    exitVector = new System.Numerics.Vector2(0, yPos);
-                    start = new System.Numerics.Vector2(_mapSize / 4 - 2, yPos);
-                }
+                Dictionary<string, System.Numerics.Vector2> entryExit = GetEntryExit(nextMapTile, vec);
+                start = entryExit["entry"];
+                exitVector = entryExit["exit"];
 
                 System.Numerics.Vector2 prevVector = GetClosestVector(exitVector, items);
                 Rect exitRoom = new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3);
@@ -212,7 +231,7 @@ public class DungeonGeneration2D : TileMap
 
                 List<Rect> corrs = SimpleConnector.CreateCorridoor(
                     exitRoom,
-                    new Rect((int)prevVector.X, (int)prevVector.Y, 1, 1)
+                    new Rect((int)prevVector.X, (int)prevVector.Y, 3, 3)
                 );
                 foreach (Rect c in corrs)
                 {
@@ -225,6 +244,7 @@ public class DungeonGeneration2D : TileMap
 
             foreach (System.Numerics.Vector2 p in items)
             {
+                // add an offset to the vectors
                 returnItems.Add(new System.Numerics.Vector2(p.X + (_mapSize / 4 * vec.X), p.Y + (_mapSize / 4 * vec.Y)));
             }
         }
