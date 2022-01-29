@@ -10,10 +10,10 @@ using GamePasta.DungeonAlgorythms;
 public class DungeonGeneration2D : TileMap
 {
     [Export]
-    private int _mapSize = 40;
+    private int _mapSize = 60;
 
     [Export]
-    private int _roomCount = 8;
+    private int _roomCount = 4;
     private enum _tileType { WALL, FLOOR }
     private Random _random = new Random();
 
@@ -49,12 +49,18 @@ public class DungeonGeneration2D : TileMap
 
         //loop through the map again and create secondary passages
         List<List<System.Numerics.Vector2>> secondaryPaths = new List<List<System.Numerics.Vector2>>();
+
+        // add the current map to our mask to not overwrite existing vectors
+        List<System.Numerics.Vector2> mask = new List<System.Numerics.Vector2>();
+        mask.AddRange(map);
+
         foreach (System.Numerics.Vector2 vec in map)
         {
+            if (vec == map[map.Count - 1]) break; // we ar at the last room
+
             // check that this tile has none blocking neighbours
-            List<System.Numerics.Vector2> neighbours = new List<System.Numerics.Vector2>();
-            List<System.Numerics.Vector2> validNeighbours = new List<System.Numerics.Vector2>()
-            {
+            List<System.Numerics.Vector2> neighbours = new List<System.Numerics.Vector2>()
+                       {
                 // north
                 new System.Numerics.Vector2(vec.X, vec.Y-1),
                 // south
@@ -65,14 +71,18 @@ public class DungeonGeneration2D : TileMap
                 new System.Numerics.Vector2(vec.X-1, vec.Y),
 
             };
+            List<System.Numerics.Vector2> validNeighbours = new List<System.Numerics.Vector2>();
+
+
             foreach (var n in neighbours)
             {
                 bool valid = true;
-                foreach (var m in map)
+                foreach (var m in mask)
                 {
-                    if (System.Numerics.Vector2.Distance(n, m) == 0)
+                    if (n.X == m.X && n.Y == m.Y)
                     {
                         valid = false;
+                        break;
                     }
                 }
                 if (valid)
@@ -81,6 +91,7 @@ public class DungeonGeneration2D : TileMap
                 }
             }
             if (validNeighbours.Count <= 0) continue;
+            GD.Print(validNeighbours.Count);
 
             // choose a none blocking neighbour
             System.Numerics.Vector2 neighbour;
@@ -101,11 +112,13 @@ public class DungeonGeneration2D : TileMap
             RandomWalk alg3 = new RandomWalk(
                 new System.Numerics.Vector2(5, 5),
                 neighbour,
-                path,
+                mask,
                 Direction.NONE,
                 3
             );
-            secondaryPaths.Add(alg3.Execute());
+            List<System.Numerics.Vector2> alg3Result = alg3.Execute();
+            secondaryPaths.Add(alg3Result);
+            mask.AddRange(alg3Result);
         }
 
         foreach (var p in secondaryPaths)
@@ -134,19 +147,7 @@ public class DungeonGeneration2D : TileMap
             SetCell((int)vec.X + 1, (int)vec.Y + 1, -1);
         }
 
-        // for(int y = 0; y < myMap.Grid.GetLength(0); y++)
-        // {
-        // 	for(int x = 0; x < myMap.Grid.GetLongLength(1); x++)
-        // 	{
-        // 		Tile t = myMap.Grid[y,x];
-        // 		if (t.Blocking)
-        // 		{
-        // 			// place a wall tile
-        // 			var tile = tiles[_random.Next(0, tiles.GetLength(0))];
-        // 			SetCell(x, y, tile);
-        // 		}
-        // 	}
-        // }
+
     }
 
     private IEnumerable<System.Numerics.Vector2> DigPath(List<System.Numerics.Vector2> map)
