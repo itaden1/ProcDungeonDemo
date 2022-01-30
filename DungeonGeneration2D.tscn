@@ -59,7 +59,6 @@ cell_size = Vector2( 32, 32 )
 cell_custom_transform = Transform2D( 16, 0, 0, 16, 0, 0 )
 format = 1
 script = ExtResource( 1 )
-_mapSize = 25
 
 [node name="Camera2D" type="Camera2D" parent="."]
 position = Vector2( 423.37, 238.26 )
