@@ -128,10 +128,6 @@ public class DungeonGeneration2D : TileMap
             System.Numerics.Vector2 prevVector = GetClosestVector(exitVector, segmentPaths[p.Key]);
             Rect exitRoom = new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3);
 
-            GD.Print($"the exit is at: {offsetExitVec[0]}");
-            GD.Print($"path to exit starts at: {prevVector}");
-            GD.Print(">>>>>>");
-
             List<Rect> corrs = SimpleConnector.CreateCorridoor(
                 exitRoom,
                 new Rect((int)prevVector.X, (int)prevVector.Y, 2, 2)
