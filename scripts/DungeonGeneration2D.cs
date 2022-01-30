@@ -127,16 +127,19 @@ public class DungeonGeneration2D : TileMap
 
             System.Numerics.Vector2 prevVector = GetClosestVector(exitVector, segmentPaths[p.Key]);
             Rect exitRoom = new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3);
+            Rect nearvecRoom = new Rect((int)prevVector.X - 1, (int)prevVector.Y - 1, 3, 3);
+
 
             List<Rect> corrs = SimpleConnector.CreateCorridoor(
                 exitRoom,
-                new Rect((int)prevVector.X, (int)prevVector.Y, 2, 2)
+                nearvecRoom
             );
             foreach (Rect c in corrs)
             {
                 segmentPaths[p.Key].AddRange(c.ToList());
             }
             segmentPaths[p.Key].AddRange(exitRoom.ToList());
+            segmentPaths[p.Key].AddRange(nearvecRoom.ToList());
 
 
             var newPath = DigPath(p.Value, entryExit["entry"]);
@@ -221,8 +224,6 @@ public class DungeonGeneration2D : TileMap
 
     private Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>> DigPath(List<System.Numerics.Vector2> map, System.Numerics.Vector2 start)
     {
-        // List<System.Numerics.Vector2> returnItems = new List<System.Numerics.Vector2>();
-
         Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>> returnItems = new Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>>();
 
         foreach (System.Numerics.Vector2 vec in map)
@@ -254,7 +255,7 @@ public class DungeonGeneration2D : TileMap
 
                 List<Rect> corrs = SimpleConnector.CreateCorridoor(
                     exitRoom,
-                    new Rect((int)prevVector.X, (int)prevVector.Y, 3, 3)
+                    new Rect((int)prevVector.X - 1, (int)prevVector.Y - 1, 3, 3)
                 );
                 foreach (Rect c in corrs)
                 {

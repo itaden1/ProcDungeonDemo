@@ -38,14 +38,14 @@ namespace GamePasta.DungeonAlgorythms
                 int y1 = (int)Math.Min(r1.Mid.Y, targetVec.Y);
                 int y2 = (int)Math.Max(r1.Mid.Y, targetVec.Y);
                 int width = 1;
-                int height = y2 - y1;
+                int height = y2 - y1 + 1;
                 Rect rect1 = new Rect((int)r1.Mid.X, y1, width, height);
 
                 // horrizontal
                 int x1 = (int)Math.Min(targetVec.X, r2.Mid.X);
                 int x2 = (int)Math.Max(targetVec.X, r2.Mid.X);
                 int width2 = x2 - x1;
-                int height2 = 1;
+                int height2 = 1 + 1;
                 Rect rect2 = new Rect(x1, (int)targetVec.Y, width2, height2);
                 return new List<Rect>() { rect1, rect2 };
             }
