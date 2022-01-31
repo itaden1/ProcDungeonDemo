@@ -110,7 +110,7 @@ namespace GamePasta.DungeonAlgorythms
                     path.AddRange(rect.ToList());
                     if (rects.Count >= 1)
                     {
-                        var corridoor = SimpleConnector.CreateCorridoor(rect, rects[rects.Count - 1]);
+                        var corridoor = Helpers.CreateCorridoor(rect, rects[rects.Count - 1]);
                         corridoors.AddRange(corridoor);
                         foreach (Rect c in corridoor)
                         {
@@ -219,7 +219,7 @@ namespace GamePasta.DungeonAlgorythms
                 {
                     if (c.Intersects(new Rect(dChoice, new Vector2(3, 3))))
                     {
-                        List<Rect> connectors = SimpleConnector.CreateCorridoor(c, new Rect(dChoice, new Vector2(1, 1)));
+                        List<Rect> connectors = Helpers.CreateCorridoor(c, new Rect(dChoice, new Vector2(1, 1)));
                         _rooms.Add(c);
                         path.AddRange(c.ToList());
                         foreach (Rect conn in connectors)

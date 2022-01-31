@@ -4,7 +4,7 @@ using System;
 
 namespace GamePasta.DungeonAlgorythms
 {
-    public class SimpleConnector
+    public class Helpers
     {
         public static List<Rect> CreateCorridoor(Rect r1, Rect r2)
         {
@@ -49,6 +49,23 @@ namespace GamePasta.DungeonAlgorythms
                 Rect rect2 = new Rect(x1, (int)targetVec.Y, width2, height2);
                 return new List<Rect>() { rect1, rect2 };
             }
+        }
+        public static System.Numerics.Vector2 GetClosestVector(System.Numerics.Vector2 vec, List<System.Numerics.Vector2> vectors)
+        {
+            if (vectors.Count <= 0) return vec;
+            System.Numerics.Vector2 closest = vectors[0];
+            foreach (System.Numerics.Vector2 vector in vectors)
+            {
+                float newDistX = Math.Abs(vec.X - vector.X);
+                float oldDistX = Math.Abs(vec.X - closest.X);
+                float newDistY = Math.Abs(vec.X - vector.X);
+                float oldDistY = Math.Abs(vec.X - closest.X);
+                if (newDistX + newDistY < oldDistX + oldDistY)
+                {
+                    closest = vector;
+                }
+            }
+            return closest;
         }
 
     }
