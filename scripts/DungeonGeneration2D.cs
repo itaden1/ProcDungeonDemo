@@ -43,6 +43,7 @@ public class DungeonGeneration2D : TileMap
         };
 
         int dTile = TileSet.FindTileByName("door");
+        int key = TileSet.FindTileByName("key");
 
         for (int i = 0; i < _mapSize + 3; i++)
         {
@@ -66,6 +67,11 @@ public class DungeonGeneration2D : TileMap
             {
                 var d = dungeonAlg.MainPathDoors[v.Key];
                 SetCell((int)d.X + 1, (int)d.Y + 1, dTile);
+            }
+            if (dungeonAlg.MainPathKeys.ContainsKey(v.Key))
+            {
+                var k = dungeonAlg.MainPathKeys[v.Key];
+                SetCell((int)k.X + 1, (int)k.Y + 1, key);
             }
         }
     }
