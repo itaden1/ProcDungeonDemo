@@ -42,8 +42,8 @@ public class DungeonGeneration2D : TileMap
             TileSet.FindTileByName("wall_3"),
         };
 
-        int dTile = TileSet.FindTileByName("door");
-        int key = TileSet.FindTileByName("key");
+        int doorTile = TileSet.FindTileByName("door");
+        int keyTile = TileSet.FindTileByName("key");
 
         for (int i = 0; i < _mapSize + 3; i++)
         {
@@ -66,12 +66,12 @@ public class DungeonGeneration2D : TileMap
             if (dungeonAlg.MainPathDoors.ContainsKey(v.Key))
             {
                 var d = dungeonAlg.MainPathDoors[v.Key];
-                SetCell((int)d.X + 1, (int)d.Y + 1, dTile);
+                SetCell((int)d.X + 1, (int)d.Y + 1, doorTile);
             }
             if (dungeonAlg.MainPathKeys.ContainsKey(v.Key))
             {
                 var k = dungeonAlg.MainPathKeys[v.Key];
-                SetCell((int)k.X + 1, (int)k.Y + 1, key);
+                SetCell((int)k.X + 1, (int)k.Y + 1, keyTile);
             }
         }
     }
