@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using System.Collections.Generic;
 using GamePasta.DungeonAlgorythms;
 // using ProcDungeon.Structures;
 // using ProcDungeon.Algorythms;
@@ -31,8 +30,7 @@ public class DungeonGeneration2D : TileMap
     {
         Clear();
         // Build a random dungeon
-        GridDungeon dungeonAlg = new GridDungeon(_mapSize, _segments, _roomCount);
-        Dictionary<System.Numerics.Vector2, List<System.Numerics.Vector2>> segmentPaths = dungeonAlg.Generate();
+        GridDungeon dungeon = new GridDungeon(_mapSize, _segments, _roomCount);
 
 
 
@@ -54,26 +52,40 @@ public class DungeonGeneration2D : TileMap
 
             }
         }
-
-        // for each path in each segment draw it to the screen
-        foreach (var v in segmentPaths)
+        foreach (var n in dungeon.MainPath)
         {
-
-            foreach (var p in v.Value)
+            foreach (var d in dungeon.MainDetail[n])
             {
-                SetCell((int)p.X + 1, (int)p.Y + 1, -1);
-            }
-            if (dungeonAlg.MainPathDoors.ContainsKey(v.Key))
-            {
-                var d = dungeonAlg.MainPathDoors[v.Key];
-                SetCell((int)d.X + 1, (int)d.Y + 1, doorTile);
-            }
-            if (dungeonAlg.MainPathKeys.ContainsKey(v.Key))
-            {
-                var k = dungeonAlg.MainPathKeys[v.Key];
-                SetCell((int)k.X + 1, (int)k.Y + 1, keyTile);
+                SetCell((int)d.X + 1, (int)d.Y + 1, -1);
             }
         }
+        foreach (var n in dungeon.SideDetail)
+        {
+
+            foreach (var d in n.Value)
+            {
+                SetCell((int)d.X + 1, (int)d.Y + 1, keyTile);
+            }
+        }
+        // for each path in each segment draw it to the screen
+        // foreach (var v in segmentPaths)
+        // {
+
+        //     foreach (var p in v.Value)
+        //     {
+        //         SetCell((int)p.X + 1, (int)p.Y + 1, -1);
+        //     }
+        //     if (dungeon.MainPathDoors.ContainsKey(v.Key))
+        //     {
+        //         var d = dungeon.MainPathDoors[v.Key];
+        //         SetCell((int)d.X + 1, (int)d.Y + 1, doorTile);
+        //     }
+        //     if (dungeon.MainPathKeys.ContainsKey(v.Key))
+        //     {
+        //         var k = dungeon.MainPathKeys[v.Key];
+        //         SetCell((int)k.X + 1, (int)k.Y + 1, keyTile);
+        //     }
+        // }
     }
 
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
