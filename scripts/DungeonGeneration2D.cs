@@ -49,39 +49,47 @@ public class DungeonGeneration2D : TileMap
 
             }
         }
-        foreach (var n in dungeon.MainPath)
+        foreach (var n in dungeon.FullMask)
         {
-            foreach (var d in dungeon.MainDetail[n])
-            {
-                SetCell((int)d.X + 1, (int)d.Y + 1, -1);
-            }
+            SetCell((int)n.X + 1, (int)n.Y + 1, -1);
         }
-        foreach (var n in dungeon.SideDetail)
+        foreach (var d in dungeon.MainPathDoors)
         {
+            SetCell((int)d.Value.X + 1, (int)d.Value.Y + 1, doorTile);
+        }
+        // foreach (var n in dungeon.MainPath)
+        // {
+        //     foreach (var d in dungeon.MainDetail[n])
+        //     {
+        //         SetCell((int)d.X + 1, (int)d.Y + 1, -1);
+        //     }
+        // }
+        // foreach (var n in dungeon.SideDetail)
+        // {
 
-            foreach (var d in n.Value)
-            {
-                SetCell((int)d.X + 1, (int)d.Y + 1, keyTile);
-            }
-        }
-        foreach (var n in dungeon.ConnectionDetail)
-        {
-            foreach (var d in n.Value)
-            {
-                SetCell((int)d.X + 1, (int)d.Y + 1, -1);
-            }
-        }
-        foreach (var c in dungeon.Chambers)
-        {
-            foreach (var d in c.Value)
-            {
-                foreach (var vec in d.ToList())
-                {
-                    SetCell((int)vec.X + 1, (int)vec.Y + 1, doorTile);
+        //     foreach (var d in n.Value)
+        //     {
+        //         SetCell((int)d.X + 1, (int)d.Y + 1, keyTile);
+        //     }
+        // }
+        // foreach (var n in dungeon.ConnectionDetail)
+        // {
+        //     foreach (var d in n.Value)
+        //     {
+        //         SetCell((int)d.X + 1, (int)d.Y + 1, keyTile);
+        //     }
+        // }
+        // foreach (var c in dungeon.Chambers)
+        // {
+        //     foreach (var d in c.Value)
+        //     {
+        //         foreach (var vec in d.ToList())
+        //         {
+        //             SetCell((int)vec.X + 1, (int)vec.Y + 1, doorTile);
 
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
     }
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
     {

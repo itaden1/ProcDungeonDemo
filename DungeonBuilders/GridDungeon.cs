@@ -15,19 +15,17 @@ namespace GamePasta.DungeonAlgorythms
             _source = from;
             _destination = to;
         }
-        // override object.Equals
-        public override bool Equals(object obj)
+        public ConnectionKey(string str)
         {
-            return Equals(obj);
+            string[] subs = str.Split(',');
+            Vector2 from = new Vector2(int.Parse(subs[0]), int.Parse(subs[1]));
+            Vector2 to = new Vector2(int.Parse(subs[3]), int.Parse(subs[4]));
+            _source = from;
+            _destination = to;
         }
-        public bool Equals(ConnectionKey other)
+        public override string ToString()
         {
-            return (other.Source == Source && other.Destination == Destination);
-        }
-        // override object.GetHashCode
-        public override int GetHashCode()
-        {
-            return base.GetHashCode();
+            return $"{_source}:{_destination}";
         }
 
     }
@@ -56,9 +54,9 @@ namespace GamePasta.DungeonAlgorythms
         public Dictionary<Vector2, List<Vector2>> MainPathBranches => _mainPathBranches;
 
 
-        private Dictionary<ConnectionKey, List<Vector2>> _connectionDetail =
-            new Dictionary<ConnectionKey, List<Vector2>>();
-        public Dictionary<ConnectionKey, List<Vector2>> ConnectionDetail => _connectionDetail;
+        private Dictionary<string, List<Vector2>> _connectionDetail =
+            new Dictionary<string, List<Vector2>>();
+        public Dictionary<string, List<Vector2>> ConnectionDetail => _connectionDetail;
 
         private Dictionary<Vector2, List<Rect>> _chambers =
             new Dictionary<Vector2, List<Rect>>();
@@ -71,6 +69,10 @@ namespace GamePasta.DungeonAlgorythms
         private Dictionary<Vector2, Vector2> _mainPathKeys =
             new Dictionary<Vector2, Vector2>();
         public Dictionary<Vector2, Vector2> MainPathKeys => _mainPathKeys;
+
+        private List<Vector2> _fullMask = new List<Vector2>();
+        public List<Vector2> FullMask => _fullMask;
+
 
         public GridDungeon(int mapSize, int segments, int roomCount)
         {
@@ -116,6 +118,7 @@ namespace GamePasta.DungeonAlgorythms
                    );
                 var p = roomDigger.Execute();
                 _mainDetail[n] = OffsetPath(n, p);
+                _fullMask.AddRange(OffsetPath(n, p));
                 List<Vector2> corrTiles = new List<Vector2>();
             }
 
@@ -130,7 +133,9 @@ namespace GamePasta.DungeonAlgorythms
                     Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, n);
                     List<Vector2> connectionData = CreateConnections(n, nextMapTile, _mainDetail[n], _mainDetail[nextMapTile]);
                     ConnectionKey conKey = new ConnectionKey(n, nextMapTile);
-                    _connectionDetail[conKey] = connectionData;
+                    _connectionDetail[conKey.ToString()] = connectionData;
+                    _fullMask.AddRange(connectionData);
+
 
                 }
             }
@@ -156,6 +161,7 @@ namespace GamePasta.DungeonAlgorythms
                     {
                         _sideDetail[np] = OffsetPath(np, p);
                     }
+                    _fullMask.AddRange(OffsetPath(np, p));
 
                     // offset the generated rooms and add them to rooms dict
                     var rooms = roomDigger.GetRooms();
@@ -163,7 +169,10 @@ namespace GamePasta.DungeonAlgorythms
                     foreach (Rect r in rooms)
                     {
                         Vector2 newPos = OffsetPath(np, new List<Vector2>() { r.Start })[0];
-                        offsetRooms.Add(r.Move((int)newPos.X, (int)newPos.Y));
+                        var movedRoom = r.Move((int)newPos.X, (int)newPos.Y);
+                        offsetRooms.Add(movedRoom);
+                        _fullMask.AddRange(movedRoom.ToList());
+
                     }
                     _chambers[np] = offsetRooms;
                 }
@@ -182,7 +191,8 @@ namespace GamePasta.DungeonAlgorythms
                         Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, np);
                         List<Vector2> connectionData = CreateConnections(np, nextMapTile, _sideDetail[np], _sideDetail[nextMapTile]);
                         ConnectionKey conKey = new ConnectionKey(np, nextMapTile);
-                        _connectionDetail[conKey] = connectionData;
+                        _connectionDetail[conKey.ToString()] = connectionData;
+                        _fullMask.AddRange(connectionData);
 
                     }
                 }
@@ -194,20 +204,29 @@ namespace GamePasta.DungeonAlgorythms
                 }
                 List<Vector2> connData = CreateConnections(mainBranchKey, n.Key, _mainDetail[mainBranchKey], _sideDetail[n.Key]);
                 ConnectionKey cKey = new ConnectionKey(n.Key, n.Value[0]);
-                _connectionDetail[cKey] = connData;
-
+                _connectionDetail[cKey.ToString()] = connData;
+                _fullMask.AddRange(connData);
             }
 
             // Find places to place locked doors
             foreach (var k in _mainPathBranches)
             {
-                // final room of the side path
+                // check this path actually exists
                 if (_sidePaths.ContainsKey(k.Value[0]))
                 {
                     // get the main path exit
                     ConnectionKey connKey = new ConnectionKey(k.Key, _mainPath[_mainPath.FindIndex(item => item == k.Key) + 1]);
-                    // var cor = _connectionDetail[connKey];
-                    // Godot.GD.Print(cor);
+                    var cor = _connectionDetail[connKey.ToString()];
+                    foreach (var vec in cor)
+                    {
+                        byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
+
+                        if (bitMask == 9 || bitMask == 6)
+                        {
+                            _mainPathDoors[k.Key] = vec;
+                            break;
+                        }
+                    }
 
                     Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
                     foreach (var c in _chambers[keyMapNode])
@@ -237,8 +256,6 @@ namespace GamePasta.DungeonAlgorythms
             returnData.AddRange(exitRoom.ToList());
             returnData.AddRange(entryRoom.ToList());
 
-
-
             List<Rect> corrs = Helpers.CreateCorridoor(
                 exitRoom,
                 // new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3),
@@ -246,7 +263,7 @@ namespace GamePasta.DungeonAlgorythms
             );
             corrs.AddRange(Helpers.CreateCorridoor(
                 entryRoom,
-                new Rect((int)nextvector.X, (int)nextvector.Y, 3, 3)
+                new Rect((int)nextvector.X, (int)nextvector.Y, 1, 1)
             ));
             foreach (Rect c in corrs)
             {

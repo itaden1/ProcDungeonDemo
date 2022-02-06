@@ -54,18 +54,38 @@ namespace GamePasta.DungeonAlgorythms
         {
             if (vectors.Count <= 0) return vec;
             System.Numerics.Vector2 closest = vectors[0];
+            float oldDist = 1000000;
             foreach (System.Numerics.Vector2 vector in vectors)
             {
-                float newDistX = Math.Abs(vec.X - vector.X);
-                float oldDistX = Math.Abs(vec.X - closest.X);
-                float newDistY = Math.Abs(vec.X - vector.X);
-                float oldDistY = Math.Abs(vec.X - closest.X);
-                if (newDistX + newDistY < oldDistX + oldDistY)
+                var dist = System.Numerics.Vector2.Distance(vec, vector);
+                if (dist < oldDist)
                 {
                     closest = vector;
+                    oldDist = dist;
                 }
             }
             return closest;
+        }
+        public static byte getFourBitMask(List<Vector2> otherVecs, Vector2 vec)
+        {
+
+            Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>
+        {
+            {1, new Vector2(vec.X, vec.Y-1)},
+            {2, new Vector2(vec.X-1, vec.Y)},
+            {4, new Vector2(vec.X+1, vec.Y)},
+            {8, new Vector2(vec.X, vec.Y+1)}
+        };
+
+            byte total = 0;
+
+            foreach (var pos in positions)
+            {
+                bool add = !otherVecs.Contains(pos.Value);
+
+                if (add) total += (byte)pos.Key;
+            }
+            return total;
         }
 
     }
