@@ -1,9 +1,6 @@
 using Godot;
 using System;
 using GamePasta.DungeonAlgorythms;
-// using ProcDungeon.Structures;
-// using ProcDungeon.Algorythms;
-// using ProcDungeon;
 
 
 public class DungeonGeneration2D : TileMap
@@ -67,27 +64,25 @@ public class DungeonGeneration2D : TileMap
                 SetCell((int)d.X + 1, (int)d.Y + 1, keyTile);
             }
         }
-        // for each path in each segment draw it to the screen
-        // foreach (var v in segmentPaths)
-        // {
+        foreach (var n in dungeon.ConnectionDetail)
+        {
+            foreach (var d in n.Value)
+            {
+                SetCell((int)d.X + 1, (int)d.Y + 1, -1);
+            }
+        }
+        foreach (var c in dungeon.Chambers)
+        {
+            foreach (var d in c.Value)
+            {
+                foreach (var vec in d.ToList())
+                {
+                    SetCell((int)vec.X + 1, (int)vec.Y + 1, doorTile);
 
-        //     foreach (var p in v.Value)
-        //     {
-        //         SetCell((int)p.X + 1, (int)p.Y + 1, -1);
-        //     }
-        //     if (dungeon.MainPathDoors.ContainsKey(v.Key))
-        //     {
-        //         var d = dungeon.MainPathDoors[v.Key];
-        //         SetCell((int)d.X + 1, (int)d.Y + 1, doorTile);
-        //     }
-        //     if (dungeon.MainPathKeys.ContainsKey(v.Key))
-        //     {
-        //         var k = dungeon.MainPathKeys[v.Key];
-        //         SetCell((int)k.X + 1, (int)k.Y + 1, keyTile);
-        //     }
-        // }
+                }
+            }
+        }
     }
-
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
     {
         _roomCount = rooms;
