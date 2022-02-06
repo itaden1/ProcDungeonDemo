@@ -64,6 +64,8 @@ namespace GamePasta.DungeonAlgorythms
         private int _maxSteps;
         private Direction _direction;
         private Vector2 _maxRoomSize;
+        private Vector2 _minRoomSize = new Vector2(2, 2);
+
         private int _maxChambers;
         private List<Rect> _rooms = new List<Rect>();
         private Dictionary<Direction, Vector2> _directionMap;
@@ -84,13 +86,14 @@ namespace GamePasta.DungeonAlgorythms
             List<Rect> rects = new List<Rect>();
             List<Rect> corridoors = new List<Rect>();
 
-            rects.Add(new Rect((int)_start.X, (int)_start.Y, 2, 2));
+            // rects.Add(new Rect((int)_start.X, (int)_start.Y, 3, 3));
+
             int threshold = 1000;
             while (rects.Count < _maxSteps)
             {
                 // create a rect
-                int width = rand.Next(2, (int)_maxRoomSize.X);
-                int height = rand.Next(2, (int)_maxRoomSize.Y);
+                int width = rand.Next((int)_minRoomSize.X, (int)_maxRoomSize.X);
+                int height = rand.Next((int)_minRoomSize.Y, (int)_maxRoomSize.Y);
                 int positionX = rand.Next(0, (int)_gridSize.X - width);
                 int positionY = rand.Next(0, (int)_gridSize.Y - height);
 

@@ -228,21 +228,27 @@ namespace GamePasta.DungeonAlgorythms
                         }
                     }
 
+                    // find place to put the key
                     Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-                    foreach (var c in _chambers[keyMapNode])
+                    Rect chamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
+                    List<Vector2> chamberVecs = chamber.ToList();
+                    if (!_mainPathDoors.ContainsKey(k.Key)) continue;
+                    if (chamberVecs.Count == 1)
                     {
-                        // _mainPathKeys[] = ;
+                        MainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[0];
+                    }
+                    else
+                    {
+                        MainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
                     }
                 }
             }
-            // find place to put the key
         }
 
         private List<Vector2> CreateConnections(Vector2 tile, Vector2 nextTile, List<Vector2> detail, List<Vector2> nextDetail)
         {
             List<Vector2> returnData = new List<Vector2>();
             Dictionary<string, Vector2> entryExit = GetEntryExit(nextTile, tile);
-            // Vector2 exitVector = entryExit["exit"];
             Vector2 entryVector = OffsetPath(nextTile, new List<Vector2>() { entryExit["entry"] })[0];
             Vector2 nextvector = Helpers.GetClosestVector(entryVector, nextDetail);
 
@@ -258,7 +264,6 @@ namespace GamePasta.DungeonAlgorythms
 
             List<Rect> corrs = Helpers.CreateCorridoor(
                 exitRoom,
-                // new Rect((int)exitVector.X, (int)exitVector.Y, 3, 3),
                 new Rect((int)prevVector.X - 1, (int)prevVector.Y - 1, 3, 3)
             );
             corrs.AddRange(Helpers.CreateCorridoor(
@@ -267,12 +272,9 @@ namespace GamePasta.DungeonAlgorythms
             ));
             foreach (Rect c in corrs)
             {
-                // corrTiles.AddRange(c.ToList());
                 returnData.AddRange(c.ToList());
             }
-
             return returnData;
-            // tiles.AddRange(corrTiles);
         }
 
         private Dictionary<Vector2, List<Vector2>> CreateBranches(List<Vector2> path)
@@ -341,7 +343,6 @@ namespace GamePasta.DungeonAlgorythms
                 }
                 neighbourMask.Add(neighbour);
             }
-            Godot.GD.Print(branches.Count);
 
             Godot.GD.Print("*****");
             return branches;
@@ -358,7 +359,7 @@ namespace GamePasta.DungeonAlgorythms
                     if (_mask.Contains(vec)) continue;  // we may want to roll to see which path gets created
 
                     Godot.GD.Print($"({branch.Key.X},{branch.Key.Y}) -> ({vec.X},{vec.Y})");
-                    int roomCount = _random.Next(2, 6);
+                    int roomCount = _random.Next(2, 3);
 
                     // execute random walk on the neighbour
                     RandomWalk sideWalk = new RandomWalk(

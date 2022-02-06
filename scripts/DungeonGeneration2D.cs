@@ -57,6 +57,10 @@ public class DungeonGeneration2D : TileMap
         {
             SetCell((int)d.Value.X + 1, (int)d.Value.Y + 1, doorTile);
         }
+        foreach (var k in dungeon.MainPathKeys)
+        {
+            SetCell((int)k.Value.X + 1, (int)k.Value.Y + 1, keyTile);
+        }
         // foreach (var n in dungeon.MainPath)
         // {
         //     foreach (var d in dungeon.MainDetail[n])
