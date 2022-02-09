@@ -4,3 +4,4 @@ lib/bin/*
 export/*
 bk
 mono_*
+blender/*
