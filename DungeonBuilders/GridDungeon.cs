@@ -119,6 +119,7 @@ namespace GamePasta.DungeonAlgorythms
                 var p = roomDigger.Execute();
                 _mainDetail[n] = OffsetPath(n, p);
                 _fullMask.AddRange(OffsetPath(n, p));
+                _chambers[n] = roomDigger.GetRooms();
                 List<Vector2> corrTiles = new List<Vector2>();
             }
 
@@ -135,8 +136,6 @@ namespace GamePasta.DungeonAlgorythms
                     ConnectionKey conKey = new ConnectionKey(n, nextMapTile);
                     _connectionDetail[conKey.ToString()] = connectionData;
                     _fullMask.AddRange(connectionData);
-
-
                 }
             }
 

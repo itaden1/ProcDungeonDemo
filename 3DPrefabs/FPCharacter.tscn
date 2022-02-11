@@ -6,7 +6,6 @@
 
 [node name="FPCharacter" type="KinematicBody"]
 script = ExtResource( 1 )
-Speed = 2
 gravity = 0.05
 MouseSensitivity = 0.4
 
