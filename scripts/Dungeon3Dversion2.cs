@@ -1,7 +1,6 @@
 using Godot;
 using GamePasta.DungeonAlgorythms;
 using System.Collections.Generic;
-using System;
 
 public class Dungeon3Dversion2 : Spatial
 {
@@ -19,7 +18,13 @@ public class Dungeon3Dversion2 : Spatial
     }
     public void GenerateLevel()
     {
-        GridDungeon dungeonBuilder = new GridDungeon(MapSize, SegmentCount, RoomCount);
+        GridDungeon dungeonBuilder = new GridDungeon(
+            MapSize,
+            SegmentCount,
+            RoomCount,
+            new System.Numerics.Vector2(0, 1),
+            new System.Numerics.Vector2(0, 4)
+        );
 
         Dictionary<string, Mesh> caveTileMeshes = new Dictionary<string, Mesh>()
         {
@@ -81,6 +86,8 @@ public class Dungeon3Dversion2 : Spatial
         }
         st.Index();
 
+        float scaleFactor = 2;
+
         Mesh mesh = st.Commit();
         SpatialMaterial material = (SpatialMaterial)ResourceLoader.Load<SpatialMaterial>("res://material/dungeon_wall.material");
         mesh.SurfaceSetMaterial(0, material);
@@ -92,15 +99,31 @@ public class Dungeon3Dversion2 : Spatial
         meshInstance.Mesh = mesh;
         meshInstance.CreateTrimeshCollision();
         AddChild(meshInstance);
+        meshInstance.Scale = new Vector3(scaleFactor, 2.5f, scaleFactor);
+        var startPos = dungeonBuilder.StarTile;
 
-        Random rng = new Random();
-        var startChamber = dungeonBuilder.Chambers[dungeonBuilder.MainPath[0]][0];
-        var chamberVecs = startChamber.ToList();
-        var startPos = chamberVecs[rng.Next(0, chamberVecs.Count - 1)];
+        // adding doors
+        foreach (var d in dungeonBuilder.MainPathDoors)
+        {
+            byte doorMask = Helpers.getFourBitMask(dungeonBuilder.FullMask, d.Value);
+
+            PackedScene doorScene = ResourceLoader.Load<PackedScene>("res://3DPrefabs/cave_prefabs/doortile.tscn");
+            Spatial door = (Spatial)doorScene.Instance();
+            door.Transform = new Transform(door.Transform.basis, new Vector3(d.Value.X * tileSize * scaleFactor, Transform.origin.y, d.Value.Y * tileSize * scaleFactor));
+            if (doorMask == 6)
+            {
+                door.Rotate(Vector3.Up, 1.570796f);
+            }
+            AddChild(door);
+        }
 
         PackedScene playerScene = (PackedScene)ResourceLoader.Load<PackedScene>("res://3DPrefabs/FPCharacter.tscn");
         KinematicBody player = (KinematicBody)playerScene.Instance();
-        Transform playerTransform = new Transform(player.Transform.basis, new Vector3(startPos.X, Transform.origin.y + 1, startPos.Y));
+
+        Transform playerTransform = new Transform(
+            player.Transform.basis,
+            new Vector3((startPos.X + 1) * tileSize * scaleFactor, Transform.origin.y, (startPos.Y + 1) * tileSize * scaleFactor));
+
         player.Transform = playerTransform;
         player.Name = "Player";
         Node world = GetTree().Root.GetNode("World");

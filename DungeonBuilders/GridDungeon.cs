@@ -73,22 +73,26 @@ namespace GamePasta.DungeonAlgorythms
         private List<Vector2> _fullMask = new List<Vector2>();
         public List<Vector2> FullMask => _fullMask;
 
-
-        public GridDungeon(int mapSize, int segments, int roomCount)
+        private Vector2 _startSegment;
+        private Vector2 _startTile;
+        public Vector2 StarTile => _startTile;
+        public GridDungeon(int mapSize, int segments, int roomCount, Vector2 startSegment, Vector2 startTile)
         {
             _mapSize = mapSize;
             _segments = segments;
             _roomCount = roomCount;
+            _startSegment = startSegment;
+            _startTile = startTile;
             Generate();
         }
         public void Generate()
         {
 
-            Vector2 start = new Vector2(0, 1);
+            Vector2 startTile = _startTile;
 
             RandomWalk mainWalk = new RandomWalk(
                 new Vector2(_segments, _segments),
-                start,
+                _startSegment,
                 new List<Vector2>(),
                 Direction.EAST,
                 0
@@ -109,9 +113,15 @@ namespace GamePasta.DungeonAlgorythms
             // dig out the level details for each node on the main path
             foreach (var n in _mainPath)
             {
+                if (n == _mainPath[0])
+                {
+                    // offset our starting position
+                    var vecList = new List<Vector2>() { new Vector2(_startTile.X, _startTile.Y) };
+                    _startTile = OffsetPath(n, vecList)[0];
+                }
                 SimpleDig roomDigger = new SimpleDig(
                        new Vector2(_mapSize / 4 - 2, _mapSize / 4 - 2),
-                       new Vector2(_random.Next(0, 5), _random.Next(0, 5)),
+                       startTile,
                        new Vector2(5, 5),
                        6,
                        _roomCount
@@ -121,6 +131,8 @@ namespace GamePasta.DungeonAlgorythms
                 _fullMask.AddRange(OffsetPath(n, p));
                 _chambers[n] = roomDigger.GetRooms();
                 List<Vector2> corrTiles = new List<Vector2>();
+
+                startTile = new Vector2(_random.Next(1, 5), _random.Next(1, 5));
             }
 
             //connect each node in main path

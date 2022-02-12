@@ -27,7 +27,7 @@ public class DungeonGeneration2D : TileMap
     {
         Clear();
         // Build a random dungeon
-        GridDungeon dungeon = new GridDungeon(_mapSize, _segments, _roomCount);
+        GridDungeon dungeon = new GridDungeon(_mapSize, _segments, _roomCount, new System.Numerics.Vector2(0, 1), new System.Numerics.Vector2(0, 4));
 
 
 

@@ -1,6 +1,6 @@
 [gd_resource type="ArrayMesh" load_steps=2 format=2]
 
-[ext_resource path="res://blender/dungeon_wall.material" type="Material" id=1]
+[ext_resource path="res://material/dungeon_wall.material" type="Material" id=1]
 
 [resource]
 resource_name = "eastcorridor_Cube027"

@@ -1,17 +1,32 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://FPCharacter.cs" type="Script" id=1]
 
 [sub_resource type="CapsuleShape" id=1]
+radius = 0.755832
+
+[sub_resource type="Environment" id=2]
+background_mode = 1
+ambient_light_color = Color( 1, 1, 1, 1 )
+ambient_light_energy = 0.5
+fog_enabled = true
+fog_color = Color( 0, 0, 0, 1 )
+fog_depth_end = 25.0
 
 [node name="FPCharacter" type="KinematicBody"]
+transform = Transform( 1, 0, 0, 0, 0.6, 0, 0, 0, 1, 0, 0.148574, 0 )
 script = ExtResource( 1 )
+Speed = 15
 gravity = 0.05
 MouseSensitivity = 0.4
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 0.5, 0, 0, 0, -2.18557e-08, -1, 0, 0.5, -4.37114e-08, 0, 0, 0 )
+transform = Transform( 0.5, 0, 0, 0, -2.18557e-08, -1, 0, 0.5, -4.37114e-08, 0, 0.973776, 0 )
 shape = SubResource( 1 )
 
 [node name="Camera" type="Camera" parent="."]
-far = 50.0
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.76345, 0 )
+keep_aspect = 0
+environment = SubResource( 2 )
+fov = 84.4
+far = 40.0
