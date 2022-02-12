@@ -102,7 +102,7 @@ public class Dungeon3Dversion2 : Spatial
         meshInstance.Scale = new Vector3(scaleFactor, 2.5f, scaleFactor);
         var startPos = dungeonBuilder.StarTile;
 
-        // adding doors
+        // add door scenes
         foreach (var d in dungeonBuilder.MainPathDoors)
         {
             byte doorMask = Helpers.getFourBitMask(dungeonBuilder.FullMask, d.Value);
@@ -110,6 +110,8 @@ public class Dungeon3Dversion2 : Spatial
             PackedScene doorScene = ResourceLoader.Load<PackedScene>("res://3DPrefabs/cave_prefabs/doortile.tscn");
             Spatial door = (Spatial)doorScene.Instance();
             door.Transform = new Transform(door.Transform.basis, new Vector3(d.Value.X * tileSize * scaleFactor, Transform.origin.y, d.Value.Y * tileSize * scaleFactor));
+
+            // rotate door depending on corridor direction
             if (doorMask == 6)
             {
                 door.Rotate(Vector3.Up, 1.570796f);
