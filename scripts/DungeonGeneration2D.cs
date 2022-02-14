@@ -39,6 +39,9 @@ public class DungeonGeneration2D : TileMap
 
         int doorTile = TileSet.FindTileByName("door");
         int keyTile = TileSet.FindTileByName("key");
+        int pressurePlateTile = TileSet.FindTileByName("pressure_plate");
+        int treasureTile = TileSet.FindTileByName("chest");
+        int secretDoorTile = TileSet.FindTileByName("secret_passage");
 
         for (int i = 0; i < _mapSize + 3; i++)
         {
@@ -60,6 +63,10 @@ public class DungeonGeneration2D : TileMap
         foreach (var k in dungeon.MainPathKeys)
         {
             SetCell((int)k.Value.X + 1, (int)k.Value.Y + 1, keyTile);
+        }
+        foreach (var s in dungeon.MainPathGates)
+        {
+            SetCell((int)s.Value.X + 1, (int)s.Value.Y + 1, secretDoorTile);
         }
     }
     private void _onRegenerateButtonPressed(int rooms, int mapSize)

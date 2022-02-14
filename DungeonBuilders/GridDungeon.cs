@@ -70,6 +70,20 @@ namespace GamePasta.DungeonAlgorythms
             new Dictionary<Vector2, Vector2>();
         public Dictionary<Vector2, Vector2> MainPathKeys => _mainPathKeys;
 
+        private Dictionary<Vector2, Vector2> _mainPathGates =
+            new Dictionary<Vector2, Vector2>();
+        public Dictionary<Vector2, Vector2> MainPathGates => _mainPathGates;
+        private Dictionary<Vector2, Vector2> _mainPathGateSwitches =
+          new Dictionary<Vector2, Vector2>();
+        public Dictionary<Vector2, Vector2> MainPathGateSwitches => _mainPathGateSwitches;
+
+        private Dictionary<Vector2, Vector2> _treasures =
+            new Dictionary<Vector2, Vector2>();
+        public Dictionary<Vector2, Vector2> Treasures => _treasures;
+        private Dictionary<Vector2, Vector2> _treasureKeys =
+            new Dictionary<Vector2, Vector2>();
+        public Dictionary<Vector2, Vector2> TreasureKeys => _treasureKeys;
+
         private List<Vector2> _fullMask = new List<Vector2>();
         public List<Vector2> FullMask => _fullMask;
 
@@ -215,45 +229,133 @@ namespace GamePasta.DungeonAlgorythms
                 }
                 List<Vector2> connData = CreateConnections(mainBranchKey, n.Key, _mainDetail[mainBranchKey], _sideDetail[n.Key]);
                 ConnectionKey cKey = new ConnectionKey(n.Key, n.Value[0]);
+                Godot.GD.Print(cKey.ToString());
                 _connectionDetail[cKey.ToString()] = connData;
                 _fullMask.AddRange(connData);
             }
-
-            // Find places to place locked doors
+            // Set random feature type of sidepath
             foreach (var k in _mainPathBranches)
             {
                 // check this path actually exists
                 if (_sidePaths.ContainsKey(k.Value[0]))
                 {
-                    // get the main path exit
-                    ConnectionKey connKey = new ConnectionKey(k.Key, _mainPath[_mainPath.FindIndex(item => item == k.Key) + 1]);
-                    var cor = _connectionDetail[connKey.ToString()];
-                    foreach (var vec in cor)
-                    {
-                        byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
+                    int featureType = _random.Next(0, 100);
 
-                        if (bitMask == 9 || bitMask == 6)
-                        {
-                            _mainPathDoors[k.Key] = vec;
+                    switch (featureType)
+                    {
+                        case int x when x <= 20 && x >= 0:
+                            buildLockedDoorFeature(k);
                             break;
-                        }
-                    }
+                        case int x when x > 20 && x <= 100:
+                            buildSecretTreasureFeature(k);
+                            break;
+                            // case int x when x > 10 && x <= 20:
+                            //     buildLockedGateFeature(k);
+                            //     break;
 
-                    // find place to put the key
-                    Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-                    Rect chamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
-                    List<Vector2> chamberVecs = chamber.ToList();
-                    if (!_mainPathDoors.ContainsKey(k.Key)) continue;
-                    if (chamberVecs.Count == 1)
-                    {
-                        MainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[0];
-                    }
-                    else
-                    {
-                        MainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
                     }
                 }
+
             }
+        }
+
+        private void buildSecretTreasureFeature(KeyValuePair<Vector2, List<Vector2>> k)
+        {
+
+            // Find corridor to side path and place a secret door / locked gate whatever
+            ConnectionKey connKey = new ConnectionKey(k.Key, _sidePaths[k.Value[0]][0]);
+            Godot.GD.Print("^^^^^^^^^");
+
+            Godot.GD.Print(connKey.ToString());
+
+            var cor = _connectionDetail[connKey.ToString()];
+            foreach (var vec in cor)
+            {
+                byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
+
+                if (bitMask == 9 || bitMask == 6)
+                {
+                    _mainPathGates[k.Key] = vec;
+                    break;
+                }
+            }
+            // find a place in current node to place a secret switch
+            Rect chamber = _chambers[k.Key][_random.Next(0, _chambers[k.Key].Count - 1)];
+            List<Vector2> chamberVecs = chamber.ToList();
+            if (!_mainPathGates.ContainsKey(k.Key)) return;
+
+            if (chamberVecs.Count == 1)
+            {
+                _mainPathGateSwitches[_mainPathGates[k.Key]] = chamberVecs[0];
+            }
+            else
+            {
+                _mainPathGateSwitches[_mainPathGates[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
+            }
+
+            // find a place in side path to place the treasure room
+            Vector2 treasureMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
+            Rect treasureChamber = _chambers[treasureMapNode][_random.Next(0, _chambers[treasureMapNode].Count - 1)];
+            List<Vector2> treasureChamberVecs = chamber.ToList();
+            if (treasureChamberVecs.Count == 1)
+            {
+                _treasures[k.Key] = treasureChamberVecs[0];
+            }
+            else
+            {
+                _treasures[k.Key] = treasureChamberVecs[_random.Next(0, treasureChamberVecs.Count - 1)];
+            }
+            // find a place in side path to place the treasure key
+            Vector2 keyMapNode = _sidePaths[k.Value[0]][_random.Next(0, _sidePaths[k.Value[0]].Count - 1)];
+            Rect keyChamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
+            List<Vector2> keyChamberVecs = chamber.ToList();
+            if (keyChamberVecs.Count == 1)
+            {
+                _treasureKeys[k.Key] = treasureChamberVecs[0];
+            }
+            else
+            {
+                _treasureKeys[k.Key] = treasureChamberVecs[_random.Next(0, treasureChamberVecs.Count - 1)];
+            }
+        }
+
+        private void buildLockedGateFeature(KeyValuePair<Vector2, List<Vector2>> k)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void buildLockedDoorFeature(KeyValuePair<Vector2, List<Vector2>> k)
+        {
+
+            // get the main path exit from this node and place a locked door
+            ConnectionKey connKey = new ConnectionKey(k.Key, _mainPath[_mainPath.FindIndex(item => item == k.Key) + 1]);
+            var cor = _connectionDetail[connKey.ToString()];
+            foreach (var vec in cor)
+            {
+                byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
+
+                if (bitMask == 9 || bitMask == 6)
+                {
+                    _mainPathDoors[k.Key] = vec;
+                    break;
+                }
+            }
+
+            // find place to put the key
+            Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
+            Rect chamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
+            List<Vector2> chamberVecs = chamber.ToList();
+            if (!_mainPathDoors.ContainsKey(k.Key)) return;
+
+            if (chamberVecs.Count == 1)
+            {
+                _mainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[0];
+            }
+            else
+            {
+                _mainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
+            }
+
         }
 
         private List<Vector2> CreateConnections(Vector2 tile, Vector2 nextTile, List<Vector2> detail, List<Vector2> nextDetail)
@@ -444,22 +546,6 @@ namespace GamePasta.DungeonAlgorythms
             }
             return results;
         }
-
-        private List<Vector2> DigPath(
-            Vector2 node,
-            Vector2 start,
-            bool placeDoors = false)
-        {
-            SimpleDig roomDigger = new SimpleDig(
-                new Vector2(_mapSize / 4 - 2, _mapSize / 4 - 2),
-                start,
-                new Vector2(5, 5),
-                6,
-                _roomCount
-            );
-            return roomDigger.Execute();
-        }
-
     }
 }
 

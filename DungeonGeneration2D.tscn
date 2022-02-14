@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=13 format=2]
 
 [ext_resource path="res://scripts/DungeonGeneration2D.cs" type="Script" id=1]
 [ext_resource path="res://tiles/stone_soup/catacombs/catacombs_0.png" type="Texture" id=2]
@@ -8,6 +8,9 @@
 [ext_resource path="res://tiles/stone_soup/catacombs/catacombs_15.png" type="Texture" id=6]
 [ext_resource path="res://tiles/stone_soup/doors/closed_door.png" type="Texture" id=7]
 [ext_resource path="res://tiles/stone_soup/items/key.png" type="Texture" id=8]
+[ext_resource path="res://tiles/stone_soup/items/chest.png" type="Texture" id=9]
+[ext_resource path="res://tiles/stone_soup/doors/cobalt_stone_12.png" type="Texture" id=10]
+[ext_resource path="res://tiles/stone_soup/doors/pressure_plate.png" type="Texture" id=11]
 
 [sub_resource type="TileSet" id=1]
 0/name = "wall_1"
@@ -80,6 +83,48 @@
 4/shape_one_way_margin = 0.0
 4/shapes = [  ]
 4/z_index = 0
+6/name = "secret_passage"
+6/texture = ExtResource( 10 )
+6/tex_offset = Vector2( 0, 0 )
+6/modulate = Color( 1, 1, 1, 1 )
+6/region = Rect2( 0, 0, 32, 32 )
+6/tile_mode = 0
+6/occluder_offset = Vector2( 0, 0 )
+6/navigation_offset = Vector2( 0, 0 )
+6/shape_offset = Vector2( 0, 0 )
+6/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+6/shape_one_way = false
+6/shape_one_way_margin = 0.0
+6/shapes = [  ]
+6/z_index = 0
+7/name = "chest"
+7/texture = ExtResource( 9 )
+7/tex_offset = Vector2( 0, 0 )
+7/modulate = Color( 1, 1, 1, 1 )
+7/region = Rect2( -1, 4, 35, 30 )
+7/tile_mode = 0
+7/occluder_offset = Vector2( 0, 0 )
+7/navigation_offset = Vector2( 0, 0 )
+7/shape_offset = Vector2( 0, 0 )
+7/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+7/shape_one_way = false
+7/shape_one_way_margin = 0.0
+7/shapes = [  ]
+7/z_index = 0
+8/name = "pressure_plate"
+8/texture = ExtResource( 11 )
+8/tex_offset = Vector2( 0, 0 )
+8/modulate = Color( 1, 1, 1, 1 )
+8/region = Rect2( -2, 1, 35, 32 )
+8/tile_mode = 0
+8/occluder_offset = Vector2( 0, 0 )
+8/navigation_offset = Vector2( 0, 0 )
+8/shape_offset = Vector2( 0, 0 )
+8/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+8/shape_one_way = false
+8/shape_one_way_margin = 0.0
+8/shapes = [  ]
+8/z_index = 0
 
 [node name="Node" type="Node"]
 
