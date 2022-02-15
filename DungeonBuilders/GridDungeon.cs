@@ -143,7 +143,19 @@ namespace GamePasta.DungeonAlgorythms
                 var p = roomDigger.Execute();
                 _mainDetail[n] = OffsetPath(n, p);
                 _fullMask.AddRange(OffsetPath(n, p));
-                _chambers[n] = roomDigger.GetRooms();
+
+                var rooms = roomDigger.GetRooms();
+                List<Rect> offsetRooms = new List<Rect>();
+                foreach (Rect r in rooms)
+                {
+                    Vector2 newPos = OffsetPath(n, new List<Vector2>() { r.Start })[0];
+                    var movedRoom = r.Move((int)newPos.X, (int)newPos.Y);
+                    offsetRooms.Add(movedRoom);
+                    _fullMask.AddRange(movedRoom.ToList());
+
+                }
+
+                _chambers[n] = offsetRooms;
                 List<Vector2> corrTiles = new List<Vector2>();
 
                 startTile = new Vector2(_random.Next(1, 5), _random.Next(1, 5));
@@ -228,7 +240,7 @@ namespace GamePasta.DungeonAlgorythms
                     if (b.Value[0] == n.Key) mainBranchKey = b.Key;
                 }
                 List<Vector2> connData = CreateConnections(mainBranchKey, n.Key, _mainDetail[mainBranchKey], _sideDetail[n.Key]);
-                ConnectionKey cKey = new ConnectionKey(n.Key, n.Value[0]);
+                ConnectionKey cKey = new ConnectionKey(mainBranchKey, n.Value[0]);
                 Godot.GD.Print(cKey.ToString());
                 _connectionDetail[cKey.ToString()] = connData;
                 _fullMask.AddRange(connData);
@@ -243,10 +255,10 @@ namespace GamePasta.DungeonAlgorythms
 
                     switch (featureType)
                     {
-                        case int x when x <= 20 && x >= 0:
+                        case int x when x <= 70 && x >= 0:
                             buildLockedDoorFeature(k);
                             break;
-                        case int x when x > 20 && x <= 100:
+                        case int x when x > 70 && x <= 100:
                             buildSecretTreasureFeature(k);
                             break;
                             // case int x when x > 10 && x <= 20:
@@ -264,9 +276,6 @@ namespace GamePasta.DungeonAlgorythms
 
             // Find corridor to side path and place a secret door / locked gate whatever
             ConnectionKey connKey = new ConnectionKey(k.Key, _sidePaths[k.Value[0]][0]);
-            Godot.GD.Print("^^^^^^^^^");
-
-            Godot.GD.Print(connKey.ToString());
 
             var cor = _connectionDetail[connKey.ToString()];
             foreach (var vec in cor)
@@ -279,10 +288,11 @@ namespace GamePasta.DungeonAlgorythms
                     break;
                 }
             }
+            if (!_mainPathGates.ContainsKey(k.Key)) return;
+
             // find a place in current node to place a secret switch
             Rect chamber = _chambers[k.Key][_random.Next(0, _chambers[k.Key].Count - 1)];
             List<Vector2> chamberVecs = chamber.ToList();
-            if (!_mainPathGates.ContainsKey(k.Key)) return;
 
             if (chamberVecs.Count == 1)
             {
@@ -295,8 +305,8 @@ namespace GamePasta.DungeonAlgorythms
 
             // find a place in side path to place the treasure room
             Vector2 treasureMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-            Rect treasureChamber = _chambers[treasureMapNode][_random.Next(0, _chambers[treasureMapNode].Count - 1)];
-            List<Vector2> treasureChamberVecs = chamber.ToList();
+            Rect treasureChamber = _chambers[treasureMapNode][_chambers[treasureMapNode].Count - 1];
+            List<Vector2> treasureChamberVecs = treasureChamber.ToList();
             if (treasureChamberVecs.Count == 1)
             {
                 _treasures[k.Key] = treasureChamberVecs[0];
@@ -308,14 +318,14 @@ namespace GamePasta.DungeonAlgorythms
             // find a place in side path to place the treasure key
             Vector2 keyMapNode = _sidePaths[k.Value[0]][_random.Next(0, _sidePaths[k.Value[0]].Count - 1)];
             Rect keyChamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
-            List<Vector2> keyChamberVecs = chamber.ToList();
+            List<Vector2> keyChamberVecs = keyChamber.ToList();
             if (keyChamberVecs.Count == 1)
             {
-                _treasureKeys[k.Key] = treasureChamberVecs[0];
+                _treasureKeys[_treasures[k.Key]] = keyChamberVecs[0];
             }
             else
             {
-                _treasureKeys[k.Key] = treasureChamberVecs[_random.Next(0, treasureChamberVecs.Count - 1)];
+                _treasureKeys[_treasures[k.Key]] = keyChamberVecs[_random.Next(0, keyChamberVecs.Count - 1)];
             }
         }
 

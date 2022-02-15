@@ -64,9 +64,21 @@ public class DungeonGeneration2D : TileMap
         {
             SetCell((int)k.Value.X + 1, (int)k.Value.Y + 1, keyTile);
         }
-        foreach (var s in dungeon.MainPathGates)
+        foreach (var g in dungeon.MainPathGates)
         {
-            SetCell((int)s.Value.X + 1, (int)s.Value.Y + 1, secretDoorTile);
+            SetCell((int)g.Value.X + 1, (int)g.Value.Y + 1, secretDoorTile);
+        }
+        foreach (var s in dungeon.MainPathGateSwitches)
+        {
+            SetCell((int)s.Value.X + 1, (int)s.Value.Y + 1, pressurePlateTile);
+        }
+        foreach (var t in dungeon.Treasures)
+        {
+            SetCell((int)t.Value.X + 1, (int)t.Value.Y + 1, treasureTile);
+        }
+        foreach (var tk in dungeon.TreasureKeys)
+        {
+            SetCell((int)tk.Value.X + 1, (int)tk.Value.Y + 1, keyTile);
         }
     }
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
