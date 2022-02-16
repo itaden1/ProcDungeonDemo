@@ -255,20 +255,53 @@ namespace GamePasta.DungeonAlgorythms
 
                     switch (featureType)
                     {
-                        case int x when x <= 70 && x >= 0:
+                        case int x when x <= 40 && x >= 0:
                             buildLockedDoorFeature(k);
                             break;
-                        case int x when x > 70 && x <= 100:
+                        case int x when x > 40 && x <= 60:
                             buildSecretTreasureFeature(k);
                             break;
-                            // case int x when x > 10 && x <= 20:
-                            //     buildLockedGateFeature(k);
-                            //     break;
-
+                        case int x when x > 60 && x <= 100:
+                            buildLoopFeature(k);
+                            break;
                     }
                 }
 
             }
+        }
+
+        private void buildLoopFeature(KeyValuePair<Vector2, List<Vector2>> k)
+        {
+            List<Vector2> nodeList = new List<Vector2>(k.Value);
+            nodeList.Reverse();
+            bool found = false;
+            foreach (var node in nodeList)
+            {
+                var neighbours = GetNeighbours(node);
+                foreach (var n in neighbours)
+                {
+                    if (_mainPath.Contains(n) && n != k.Key && n != _mainPath[_mainPath.Count - 1])
+                    {
+                        List<Vector2> connectionData = CreateConnections(n, node, _mainDetail[n], _sideDetail[node]);
+                        ConnectionKey cKey = new ConnectionKey(n, node);
+                        _connectionDetail[cKey.ToString()] = connectionData;
+                        _fullMask.AddRange(connectionData);
+
+
+                        var gate = PlaceDoor(connectionData, _fullMask);
+                        if (gate != null) _mainPathGates[k.Key] = (Vector2)gate;
+                        var gateKey = PlaceItem(_chambers[node]);
+                        _mainPathGateSwitches[_mainPathGates[k.Key]] = gateKey;
+
+
+                        found = true;
+                        break;
+                    }
+
+                }
+                if (found) break;
+            }
+            if (!found) buildLockedDoorFeature(k);
         }
 
         private void buildSecretTreasureFeature(KeyValuePair<Vector2, List<Vector2>> k)
@@ -276,62 +309,24 @@ namespace GamePasta.DungeonAlgorythms
 
             // Find corridor to side path and place a secret door / locked gate whatever
             ConnectionKey connKey = new ConnectionKey(k.Key, _sidePaths[k.Value[0]][0]);
-
             var cor = _connectionDetail[connKey.ToString()];
-            foreach (var vec in cor)
-            {
-                byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
+            var gate = PlaceDoor(cor, _fullMask);
 
-                if (bitMask == 9 || bitMask == 6)
-                {
-                    _mainPathGates[k.Key] = vec;
-                    break;
-                }
-            }
-            if (!_mainPathGates.ContainsKey(k.Key)) return;
+            if (gate != null) _mainPathGates[k.Key] = (Vector2)gate;
+            else return;
+
 
             // find a place in current node to place a secret switch
-            Rect chamber = _chambers[k.Key][_random.Next(0, _chambers[k.Key].Count - 1)];
-            List<Vector2> chamberVecs = chamber.ToList();
+            _mainPathGateSwitches[_mainPathGates[k.Key]] = PlaceItem(_chambers[k.Key]);
 
-            if (chamberVecs.Count == 1)
-            {
-                _mainPathGateSwitches[_mainPathGates[k.Key]] = chamberVecs[0];
-            }
-            else
-            {
-                _mainPathGateSwitches[_mainPathGates[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
-            }
 
             // find a place in side path to place the treasure room
             Vector2 treasureMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-            Rect treasureChamber = _chambers[treasureMapNode][_chambers[treasureMapNode].Count - 1];
-            List<Vector2> treasureChamberVecs = treasureChamber.ToList();
-            if (treasureChamberVecs.Count == 1)
-            {
-                _treasures[k.Key] = treasureChamberVecs[0];
-            }
-            else
-            {
-                _treasures[k.Key] = treasureChamberVecs[_random.Next(0, treasureChamberVecs.Count - 1)];
-            }
+            _treasures[k.Key] = PlaceItem(_chambers[treasureMapNode]);
+
             // find a place in side path to place the treasure key
             Vector2 keyMapNode = _sidePaths[k.Value[0]][_random.Next(0, _sidePaths[k.Value[0]].Count - 1)];
-            Rect keyChamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
-            List<Vector2> keyChamberVecs = keyChamber.ToList();
-            if (keyChamberVecs.Count == 1)
-            {
-                _treasureKeys[_treasures[k.Key]] = keyChamberVecs[0];
-            }
-            else
-            {
-                _treasureKeys[_treasures[k.Key]] = keyChamberVecs[_random.Next(0, keyChamberVecs.Count - 1)];
-            }
-        }
-
-        private void buildLockedGateFeature(KeyValuePair<Vector2, List<Vector2>> k)
-        {
-            throw new NotImplementedException();
+            _treasureKeys[_treasures[k.Key]] = PlaceItem(_chambers[keyMapNode]);
         }
 
         private void buildLockedDoorFeature(KeyValuePair<Vector2, List<Vector2>> k)
@@ -340,34 +335,46 @@ namespace GamePasta.DungeonAlgorythms
             // get the main path exit from this node and place a locked door
             ConnectionKey connKey = new ConnectionKey(k.Key, _mainPath[_mainPath.FindIndex(item => item == k.Key) + 1]);
             var cor = _connectionDetail[connKey.ToString()];
+            var door = PlaceDoor(cor, _fullMask);
+            if (door != null) _mainPathDoors[k.Key] = (Vector2)door;
+            else return;
+
+            // put the key in final room
+            Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
+            _mainPathKeys[_mainPathDoors[k.Key]] = PlaceItem(_chambers[keyMapNode]);
+
+        }
+        private Vector2? PlaceDoor(List<Vector2> cor, List<Vector2> fullMask)
+        {
+            Vector2? door = null;
             foreach (var vec in cor)
             {
                 byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
 
                 if (bitMask == 9 || bitMask == 6)
                 {
-                    _mainPathDoors[k.Key] = vec;
+                    door = vec;
                     break;
                 }
-            }
-
-            // find place to put the key
-            Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-            Rect chamber = _chambers[keyMapNode][_random.Next(0, _chambers[keyMapNode].Count - 1)];
+            };
+            return door;
+        }
+        private Vector2 PlaceItem(List<Rect> rects)
+        {
+            Vector2 theKey;
+            Rect chamber = rects[_random.Next(0, rects.Count - 1)];
             List<Vector2> chamberVecs = chamber.ToList();
-            if (!_mainPathDoors.ContainsKey(k.Key)) return;
 
             if (chamberVecs.Count == 1)
             {
-                _mainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[0];
+                theKey = chamberVecs[0];
             }
             else
             {
-                _mainPathKeys[_mainPathDoors[k.Key]] = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
+                theKey = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
             }
-
+            return theKey;
         }
-
         private List<Vector2> CreateConnections(Vector2 tile, Vector2 nextTile, List<Vector2> detail, List<Vector2> nextDetail)
         {
             List<Vector2> returnData = new List<Vector2>();
@@ -409,18 +416,8 @@ namespace GamePasta.DungeonAlgorythms
             {
                 if (vec == path[path.Count - 1]) break; // we ar at the last room
                                                         // check that this tile has none blocking neighbours
-                List<Vector2> neighbours = new List<Vector2>()
-                {
-                    // north
-                    new Vector2(vec.X, vec.Y-1),
-                    // south
-                    new Vector2(vec.X, vec.Y+1),
-                    //east
-                    new Vector2(vec.X+1, vec.Y),
-                    //west
-                    new Vector2(vec.X-1, vec.Y),
 
-                };
+                List<Vector2> neighbours = GetNeighbours(vec);
                 List<Vector2> validNeighbours = new List<Vector2>();
 
 
@@ -469,6 +466,22 @@ namespace GamePasta.DungeonAlgorythms
 
             Godot.GD.Print("*****");
             return branches;
+        }
+
+        private List<Vector2> GetNeighbours(Vector2 vec)
+        {
+            return new List<Vector2>()
+                {
+                    // north
+                    new Vector2(vec.X, vec.Y-1),
+                    // south
+                    new Vector2(vec.X, vec.Y+1),
+                    //east
+                    new Vector2(vec.X+1, vec.Y),
+                    //west
+                    new Vector2(vec.X-1, vec.Y),
+
+                };
         }
 
         private Dictionary<Vector2, List<Vector2>> CreateSecondaryPaths(Dictionary<Vector2, List<Vector2>> branchPoints)
