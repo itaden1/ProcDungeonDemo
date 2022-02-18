@@ -70,12 +70,12 @@ namespace GamePasta.DungeonAlgorythms
         {
 
             Dictionary<int, Vector2> positions = new Dictionary<int, Vector2>
-        {
-            {1, new Vector2(vec.X, vec.Y-1)},
-            {2, new Vector2(vec.X-1, vec.Y)},
-            {4, new Vector2(vec.X+1, vec.Y)},
-            {8, new Vector2(vec.X, vec.Y+1)}
-        };
+            {
+                {1, new Vector2(vec.X, vec.Y-1)},
+                {2, new Vector2(vec.X-1, vec.Y)},
+                {4, new Vector2(vec.X+1, vec.Y)},
+                {8, new Vector2(vec.X, vec.Y+1)}
+            };
 
             byte total = 0;
 
@@ -87,8 +87,22 @@ namespace GamePasta.DungeonAlgorythms
             }
             return total;
         }
+        public static List<Vector2> GetNeighbours(Vector2 vec)
+        {
+            return new List<Vector2>()
+            {
+                // north
+                new Vector2(vec.X, vec.Y-1),
+                // south
+                new Vector2(vec.X, vec.Y+1),
+                //east
+                new Vector2(vec.X+1, vec.Y),
+                //west
+                new Vector2(vec.X-1, vec.Y),
 
-
+            };
+        }
     }
+
 }
 

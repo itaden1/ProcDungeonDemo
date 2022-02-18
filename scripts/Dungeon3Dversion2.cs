@@ -9,6 +9,8 @@ public class Dungeon3Dversion2 : Spatial
     [Export]
     public int SegmentCount = 4;
     [Export]
+    public int SegmentSize = 16;
+    [Export]
     public int RoomCount = 4;
     [Export]
     public float tileSize = 4f;
@@ -18,14 +20,15 @@ public class Dungeon3Dversion2 : Spatial
     }
     public void GenerateLevel()
     {
-        GridDungeon dungeonBuilder = new GridDungeon(
-            MapSize,
+        GridDungeon dungeon = new GridDungeon(
             SegmentCount,
+            SegmentSize,
             RoomCount,
             new System.Numerics.Vector2(0, 1),
             new System.Numerics.Vector2(0, 4)
         );
 
+        FeatureBuilder dungeonfeature = new FeatureBuilder(dungeon);
         Dictionary<string, Mesh> caveTileMeshes = new Dictionary<string, Mesh>()
         {
             {"northWall", ResourceLoader.Load<Mesh>("res://3DPrefabs/CaveTiles/northwall.tres")},
@@ -74,10 +77,10 @@ public class Dungeon3Dversion2 : Spatial
         SurfaceTool st = new SurfaceTool();
         st.Begin(Mesh.PrimitiveType.Triangles);
 
-        foreach (var vec in dungeonBuilder.FullMask)
+        foreach (var vec in dungeon.FullMask)
         {
             Vector2 vector = ToGDVec2(vec);
-            byte mask = Helpers.getFourBitMask(dungeonBuilder.FullMask, vec);
+            byte mask = Helpers.getFourBitMask(dungeon.FullMask, vec);
             if (bitMaskMap.ContainsKey(mask))
             {
                 Mesh m = bitMaskMap[mask];
@@ -100,12 +103,12 @@ public class Dungeon3Dversion2 : Spatial
         meshInstance.CreateTrimeshCollision();
         AddChild(meshInstance);
         meshInstance.Scale = new Vector3(scaleFactor, 2.5f, scaleFactor);
-        var startPos = dungeonBuilder.StarTile;
+        var startPos = dungeon.StarTile;
 
         // add door scenes
-        foreach (var d in dungeonBuilder.MainPathDoors)
+        foreach (var d in dungeonfeature.Doors)
         {
-            byte doorMask = Helpers.getFourBitMask(dungeonBuilder.FullMask, d.Value);
+            byte doorMask = Helpers.getFourBitMask(dungeon.FullMask, d.Value);
 
             PackedScene doorScene = ResourceLoader.Load<PackedScene>("res://3DPrefabs/cave_prefabs/doortile.tscn");
             Spatial door = (Spatial)doorScene.Instance();

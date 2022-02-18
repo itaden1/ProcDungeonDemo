@@ -35,7 +35,13 @@ namespace GamePasta.DungeonAlgorythms
         private Random _random = new Random();
         private int _mapSize;
         private int _segments;
+        private int _segmentSize;
+
         private int _roomCount;
+
+        private Vector2 _startSegment;
+        private Vector2 _startTile;
+        public Vector2 StarTile => _startTile;
         private List<Vector2> _mask = new List<Vector2>();
 
         private List<Vector2> _mainPath = new List<Vector2>();
@@ -44,7 +50,7 @@ namespace GamePasta.DungeonAlgorythms
         public Dictionary<Vector2, List<Vector2>> MainDetail => _mainDetail;
 
         private Dictionary<Vector2, List<Vector2>> _sidePaths;
-        public Dictionary<Vector2, List<Vector2>> SidePath => _sidePaths;
+        public Dictionary<Vector2, List<Vector2>> SidePaths => _sidePaths;
 
         private Dictionary<Vector2, List<Vector2>> _sideDetail = new Dictionary<Vector2, List<Vector2>>();
         public Dictionary<Vector2, List<Vector2>> SideDetail => _sideDetail;
@@ -87,13 +93,11 @@ namespace GamePasta.DungeonAlgorythms
         private List<Vector2> _fullMask = new List<Vector2>();
         public List<Vector2> FullMask => _fullMask;
 
-        private Vector2 _startSegment;
-        private Vector2 _startTile;
-        public Vector2 StarTile => _startTile;
-        public GridDungeon(int mapSize, int segments, int roomCount, Vector2 startSegment, Vector2 startTile)
+        public GridDungeon(int segments, int segmentSize, int roomCount, Vector2 startSegment, Vector2 startTile)
         {
-            _mapSize = mapSize;
+            _startSegment = startSegment;
             _segments = segments;
+            _segmentSize = segmentSize;
             _roomCount = roomCount;
             _startSegment = startSegment;
             _startTile = startTile;
@@ -134,7 +138,7 @@ namespace GamePasta.DungeonAlgorythms
                     _startTile = OffsetPath(n, vecList)[0];
                 }
                 SimpleDig roomDigger = new SimpleDig(
-                       new Vector2(_mapSize / 4 - 2, _mapSize / 4 - 2),
+                       new Vector2(_segmentSize - 1, _segmentSize - 1),
                        startTile,
                        new Vector2(5, 5),
                        6,
@@ -169,7 +173,7 @@ namespace GamePasta.DungeonAlgorythms
                 if (nextMapTileIndex < _mainPath.Count)
                 {
                     Vector2 nextMapTile = new Vector2(_mainPath[nextMapTileIndex].X, _mainPath[nextMapTileIndex].Y);
-                    Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, n);
+                    Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, n, _segmentSize);
                     List<Vector2> connectionData = CreateConnections(n, nextMapTile, _mainDetail[n], _mainDetail[nextMapTile]);
                     ConnectionKey conKey = new ConnectionKey(n, nextMapTile);
                     _connectionDetail[conKey.ToString()] = connectionData;
@@ -183,7 +187,7 @@ namespace GamePasta.DungeonAlgorythms
                 foreach (var np in n.Value)
                 {
                     SimpleDig roomDigger = new SimpleDig(
-                        new Vector2(_mapSize / 4 - 2, _mapSize / 4 - 2),
+                        new Vector2(_segmentSize - 1, _segmentSize - 1),
                         new Vector2(_random.Next(0, 5), _random.Next(0, 5)),
                         new Vector2(5, 5),
                         6,
@@ -225,7 +229,7 @@ namespace GamePasta.DungeonAlgorythms
                     if (nextMapTileIndex < n.Value.Count)
                     {
                         Vector2 nextMapTile = new Vector2(n.Value[nextMapTileIndex].X, n.Value[nextMapTileIndex].Y);
-                        Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, np);
+                        Dictionary<string, Vector2> entryExit = GetEntryExit(nextMapTile, np, _segmentSize);
                         List<Vector2> connectionData = CreateConnections(np, nextMapTile, _sideDetail[np], _sideDetail[nextMapTile]);
                         ConnectionKey conKey = new ConnectionKey(np, nextMapTile);
                         _connectionDetail[conKey.ToString()] = connectionData;
@@ -245,140 +249,16 @@ namespace GamePasta.DungeonAlgorythms
                 _connectionDetail[cKey.ToString()] = connData;
                 _fullMask.AddRange(connData);
             }
-            // Set random feature type of sidepath
-            foreach (var k in _mainPathBranches)
-            {
-                // check this path actually exists
-                if (_sidePaths.ContainsKey(k.Value[0]))
-                {
-                    int featureType = _random.Next(0, 100);
-
-                    switch (featureType)
-                    {
-                        case int x when x <= 40 && x >= 0:
-                            buildLockedDoorFeature(k);
-                            break;
-                        case int x when x > 40 && x <= 60:
-                            buildSecretTreasureFeature(k);
-                            break;
-                        case int x when x > 60 && x <= 100:
-                            buildLoopFeature(k);
-                            break;
-                    }
-                }
-
-            }
         }
-
-        private void buildLoopFeature(KeyValuePair<Vector2, List<Vector2>> k)
+        public void AddConnection(string key, List<Vector2> connectionData)
         {
-            List<Vector2> nodeList = new List<Vector2>(k.Value);
-            nodeList.Reverse();
-            bool found = false;
-            foreach (var node in nodeList)
-            {
-                var neighbours = GetNeighbours(node);
-                foreach (var n in neighbours)
-                {
-                    if (_mainPath.Contains(n) && n != k.Key && n != _mainPath[_mainPath.Count - 1])
-                    {
-                        List<Vector2> connectionData = CreateConnections(n, node, _mainDetail[n], _sideDetail[node]);
-                        ConnectionKey cKey = new ConnectionKey(n, node);
-                        _connectionDetail[cKey.ToString()] = connectionData;
-                        _fullMask.AddRange(connectionData);
-
-
-                        var gate = PlaceDoor(connectionData, _fullMask);
-                        if (gate != null) _mainPathGates[k.Key] = (Vector2)gate;
-                        var gateKey = PlaceItem(_chambers[node]);
-                        _mainPathGateSwitches[_mainPathGates[k.Key]] = gateKey;
-
-
-                        found = true;
-                        break;
-                    }
-
-                }
-                if (found) break;
-            }
-            if (!found) buildLockedDoorFeature(k);
+            _connectionDetail[key] = connectionData;
+            _fullMask.AddRange(connectionData);
         }
-
-        private void buildSecretTreasureFeature(KeyValuePair<Vector2, List<Vector2>> k)
-        {
-
-            // Find corridor to side path and place a secret door / locked gate whatever
-            ConnectionKey connKey = new ConnectionKey(k.Key, _sidePaths[k.Value[0]][0]);
-            var cor = _connectionDetail[connKey.ToString()];
-            var gate = PlaceDoor(cor, _fullMask);
-
-            if (gate != null) _mainPathGates[k.Key] = (Vector2)gate;
-            else return;
-
-
-            // find a place in current node to place a secret switch
-            _mainPathGateSwitches[_mainPathGates[k.Key]] = PlaceItem(_chambers[k.Key]);
-
-
-            // find a place in side path to place the treasure room
-            Vector2 treasureMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-            _treasures[k.Key] = PlaceItem(_chambers[treasureMapNode]);
-
-            // find a place in side path to place the treasure key
-            Vector2 keyMapNode = _sidePaths[k.Value[0]][_random.Next(0, _sidePaths[k.Value[0]].Count - 1)];
-            _treasureKeys[_treasures[k.Key]] = PlaceItem(_chambers[keyMapNode]);
-        }
-
-        private void buildLockedDoorFeature(KeyValuePair<Vector2, List<Vector2>> k)
-        {
-
-            // get the main path exit from this node and place a locked door
-            ConnectionKey connKey = new ConnectionKey(k.Key, _mainPath[_mainPath.FindIndex(item => item == k.Key) + 1]);
-            var cor = _connectionDetail[connKey.ToString()];
-            var door = PlaceDoor(cor, _fullMask);
-            if (door != null) _mainPathDoors[k.Key] = (Vector2)door;
-            else return;
-
-            // put the key in final room
-            Vector2 keyMapNode = _sidePaths[k.Value[0]][_sidePaths[k.Value[0]].Count - 1];
-            _mainPathKeys[_mainPathDoors[k.Key]] = PlaceItem(_chambers[keyMapNode]);
-
-        }
-        private Vector2? PlaceDoor(List<Vector2> cor, List<Vector2> fullMask)
-        {
-            Vector2? door = null;
-            foreach (var vec in cor)
-            {
-                byte bitMask = Helpers.getFourBitMask(_fullMask, vec);
-
-                if (bitMask == 9 || bitMask == 6)
-                {
-                    door = vec;
-                    break;
-                }
-            };
-            return door;
-        }
-        private Vector2 PlaceItem(List<Rect> rects)
-        {
-            Vector2 theKey;
-            Rect chamber = rects[_random.Next(0, rects.Count - 1)];
-            List<Vector2> chamberVecs = chamber.ToList();
-
-            if (chamberVecs.Count == 1)
-            {
-                theKey = chamberVecs[0];
-            }
-            else
-            {
-                theKey = chamberVecs[_random.Next(0, chamberVecs.Count - 1)];
-            }
-            return theKey;
-        }
-        private List<Vector2> CreateConnections(Vector2 tile, Vector2 nextTile, List<Vector2> detail, List<Vector2> nextDetail)
+        public List<Vector2> CreateConnections(Vector2 tile, Vector2 nextTile, List<Vector2> detail, List<Vector2> nextDetail)
         {
             List<Vector2> returnData = new List<Vector2>();
-            Dictionary<string, Vector2> entryExit = GetEntryExit(nextTile, tile);
+            Dictionary<string, Vector2> entryExit = GetEntryExit(nextTile, tile, _segmentSize);
             Vector2 entryVector = OffsetPath(nextTile, new List<Vector2>() { entryExit["entry"] })[0];
             Vector2 nextvector = Helpers.GetClosestVector(entryVector, nextDetail);
 
@@ -417,7 +297,7 @@ namespace GamePasta.DungeonAlgorythms
                 if (vec == path[path.Count - 1]) break; // we ar at the last room
                                                         // check that this tile has none blocking neighbours
 
-                List<Vector2> neighbours = GetNeighbours(vec);
+                List<Vector2> neighbours = Helpers.GetNeighbours(vec);
                 List<Vector2> validNeighbours = new List<Vector2>();
 
 
@@ -468,22 +348,6 @@ namespace GamePasta.DungeonAlgorythms
             return branches;
         }
 
-        private List<Vector2> GetNeighbours(Vector2 vec)
-        {
-            return new List<Vector2>()
-                {
-                    // north
-                    new Vector2(vec.X, vec.Y-1),
-                    // south
-                    new Vector2(vec.X, vec.Y+1),
-                    //east
-                    new Vector2(vec.X+1, vec.Y),
-                    //west
-                    new Vector2(vec.X-1, vec.Y),
-
-                };
-        }
-
         private Dictionary<Vector2, List<Vector2>> CreateSecondaryPaths(Dictionary<Vector2, List<Vector2>> branchPoints)
         {
             Dictionary<Vector2, List<Vector2>> paths = new Dictionary<Vector2, List<Vector2>>();
@@ -529,43 +393,43 @@ namespace GamePasta.DungeonAlgorythms
             List<Vector2> returnItems = new List<Vector2>();
             foreach (Vector2 p in items)
             {
-                returnItems.Add(new Vector2(p.X + (_mapSize / 4 * vec.X), p.Y + (_mapSize / 4 * vec.Y)));
+                returnItems.Add(new Vector2(p.X + (_segmentSize * vec.X), p.Y + (_segmentSize * vec.Y)));
             }
             return returnItems;
         }
 
-        private Dictionary<string, Vector2> GetEntryExit(Vector2 to, Vector2 from)
+        private Dictionary<string, Vector2> GetEntryExit(Vector2 to, Vector2 from, int segmentSize)
         {
             Dictionary<string, Vector2> results = new Dictionary<string, Vector2>();
             if (to.X > from.X) // direction is east
             {
-                int yPos = _random.Next(2, (_mapSize / 4) - 2);
+                int yPos = _random.Next(2, (segmentSize) - 2);
 
-                results["exit"] = new Vector2(_mapSize / 4 - 1, yPos);
+                results["exit"] = new Vector2(segmentSize - 1, yPos);
                 results["entry"] = new Vector2(0, yPos);
             }
             else if (to.Y > from.Y) // direction is south
             {
-                int xPos = _random.Next(2, (_mapSize / 4) - 2);
+                int xPos = _random.Next(2, (segmentSize) - 2);
 
-                results["exit"] = new Vector2(xPos, _mapSize / 4 - 1);
+                results["exit"] = new Vector2(xPos, segmentSize - 1);
                 results["entry"] = new Vector2(xPos, 0);
 
             }
             else if (to.Y < from.Y) // north
             {
-                int xPos = _random.Next(2, (_mapSize / 4) - 2);
+                int xPos = _random.Next(2, (segmentSize) - 2);
 
                 results["exit"] = new Vector2(xPos, 0);
-                results["entry"] = new Vector2(xPos, _mapSize / 4 - 1);
+                results["entry"] = new Vector2(xPos, segmentSize - 1);
 
             }
             else if (to.X < from.X) // west
             {
-                int yPos = _random.Next(2, (_mapSize / 4) - 2);
+                int yPos = _random.Next(2, (segmentSize) - 2);
 
                 results["exit"] = new Vector2(0, yPos);
-                results["entry"] = new Vector2(_mapSize / 4 - 1, yPos);
+                results["entry"] = new Vector2(segmentSize - 1, yPos);
             }
             return results;
         }
