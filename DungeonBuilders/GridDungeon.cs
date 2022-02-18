@@ -68,28 +68,6 @@ namespace GamePasta.DungeonAlgorythms
             new Dictionary<Vector2, List<Rect>>();
         public Dictionary<Vector2, List<Rect>> Chambers => _chambers;
 
-        private Dictionary<Vector2, Vector2> _mainPathDoors =
-            new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> MainPathDoors => _mainPathDoors;
-
-        private Dictionary<Vector2, Vector2> _mainPathKeys =
-            new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> MainPathKeys => _mainPathKeys;
-
-        private Dictionary<Vector2, Vector2> _mainPathGates =
-            new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> MainPathGates => _mainPathGates;
-        private Dictionary<Vector2, Vector2> _mainPathGateSwitches =
-          new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> MainPathGateSwitches => _mainPathGateSwitches;
-
-        private Dictionary<Vector2, Vector2> _treasures =
-            new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> Treasures => _treasures;
-        private Dictionary<Vector2, Vector2> _treasureKeys =
-            new Dictionary<Vector2, Vector2>();
-        public Dictionary<Vector2, Vector2> TreasureKeys => _treasureKeys;
-
         private List<Vector2> _fullMask = new List<Vector2>();
         public List<Vector2> FullMask => _fullMask;
 
@@ -435,4 +413,3 @@ namespace GamePasta.DungeonAlgorythms
         }
     }
 }
-
