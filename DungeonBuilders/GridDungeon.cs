@@ -87,7 +87,7 @@ namespace GamePasta.DungeonAlgorythms
             Vector2 startTile = _startTile;
 
             RandomWalk mainWalk = new RandomWalk(
-                new Vector2(_segments, _segments),
+                new Vector2(_segments + 1, _segments + 1),
                 _startSegment,
                 new List<Vector2>(),
                 Direction.EAST,

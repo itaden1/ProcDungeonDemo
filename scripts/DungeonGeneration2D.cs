@@ -1,7 +1,7 @@
 using Godot;
 using System;
 using GamePasta.DungeonAlgorythms;
-
+using System.Collections.Generic;
 
 public class DungeonGeneration2D : TileMap
 {
@@ -10,9 +10,9 @@ public class DungeonGeneration2D : TileMap
     private int _roomCount = 4;
 
     [Export]
-    private int _segments = 6;
+    private int _segments = 4;
     [Export]
-    private int _segmentSize = 15;
+    private int _segmentSize = 16;
 
     private enum _tileType { WALL, FLOOR }
     private Random _random = new Random();
@@ -27,9 +27,24 @@ public class DungeonGeneration2D : TileMap
     {
         Clear();
         // Build a random dungeon
-        GridDungeon dungeon = new GridDungeon(_segments, _segmentSize, _roomCount, new System.Numerics.Vector2(0, 2), new System.Numerics.Vector2(-2, 4));
+        GridDungeon dungeon = new GridDungeon(_segments, _segmentSize, _roomCount, new System.Numerics.Vector2(0, 2), new System.Numerics.Vector2(-2, 2));
 
         FeatureBuilder dungeonFeatures = new FeatureBuilder(dungeon);
+
+        Dictionary<System.Numerics.Vector2, string> biomeMap = new Dictionary<System.Numerics.Vector2, string>();
+        List<string> biomes = new List<string>() { "cave", "forrest", "catacombs" };
+        foreach (var n in dungeon.MainPath)
+        {
+            biomeMap[n] = biomes[_random.Next(0, biomes.Count)];
+        }
+        Dictionary<string, int> biomeTiles = new Dictionary<string, int>()
+        {
+            {"cave", TileSet.FindTileByName("cave")},
+            {"forrest", TileSet.FindTileByName("tree")},
+            {"catacombs", TileSet.FindTileByName("wall_3")}
+        };
+
+        // Dictionary<>
 
         int[] tiles = new int[]{
             TileSet.FindTileByName("wall_1"),
@@ -43,15 +58,35 @@ public class DungeonGeneration2D : TileMap
         int treasureTile = TileSet.FindTileByName("chest");
         int secretDoorTile = TileSet.FindTileByName("secret_passage");
 
-        int mapSize = _segments * (_segmentSize - 1);
+        int mapSize = _segments * (_segmentSize);
 
-        for (int i = 0; i < mapSize + 3; i++)
+        foreach (var n in dungeon.MainPath)
         {
-            for (int j = 0; j < mapSize + 3; j++)
+            var tile = biomeTiles[biomeMap[n]];
+            for (int x = (int)n.X * _segmentSize; x < ((int)n.X + 1) * _segmentSize; x++)
             {
-                var tile = tiles[_random.Next(0, tiles.GetLength(0))];
-                SetCell(i, j, tile);
+                for (int y = (int)n.Y * _segmentSize; y < ((int)n.Y + 1) * _segmentSize; y++)
+                {
+                    SetCell(x, y, tile);
+                }
+            }
+            if (!dungeon.MainPathBranches.ContainsKey(n)) continue;
 
+
+            var branch = dungeon.MainPathBranches[n];
+
+            if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
+            foreach (var sp in dungeon.SidePaths[branch[0]])
+            {
+                GD.Print("yup");
+
+                for (int x = (int)sp.X * _segmentSize; x < ((int)sp.X + 1) * _segmentSize; x++)
+                {
+                    for (int y = (int)sp.Y * _segmentSize; y < ((int)sp.Y + 1) * _segmentSize; y++)
+                    {
+                        SetCell(x, y, tile);
+                    }
+                }
             }
         }
         foreach (var n in dungeon.FullMask)
