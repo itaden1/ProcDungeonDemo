@@ -10,7 +10,7 @@ public class DungeonGeneration2D : TileMap
     private int _roomCount = 4;
 
     [Export]
-    private int _segments = 4;
+    private int _segments = 5;
     [Export]
     private int _segmentSize = 16;
 
@@ -33,9 +33,20 @@ public class DungeonGeneration2D : TileMap
 
         Dictionary<System.Numerics.Vector2, string> biomeMap = new Dictionary<System.Numerics.Vector2, string>();
         List<string> biomes = new List<string>() { "cave", "forrest", "catacombs" };
-        foreach (var n in dungeon.MainPath)
+        for (var i = 0; i < dungeon.MainPath.Count; i++)
         {
-            biomeMap[n] = biomes[_random.Next(0, biomes.Count)];
+            if (i < dungeon.MainPath.Count / 3)
+            {
+                biomeMap[dungeon.MainPath[i]] = "forrest";
+            }
+            else if (i < dungeon.MainPath.Count / 3 * 2)
+            {
+                biomeMap[dungeon.MainPath[i]] = "cave";
+            }
+            else
+            {
+                biomeMap[dungeon.MainPath[i]] = "catacombs";
+            }
         }
         Dictionary<string, int> biomeTiles = new Dictionary<string, int>()
         {
@@ -57,15 +68,17 @@ public class DungeonGeneration2D : TileMap
         int pressurePlateTile = TileSet.FindTileByName("pressure_plate");
         int treasureTile = TileSet.FindTileByName("chest");
         int secretDoorTile = TileSet.FindTileByName("secret_passage");
+        int roomTile = TileSet.FindTileByName("room");
 
-        int mapSize = _segments * (_segmentSize);
+
+        var size = _segmentSize;
 
         foreach (var n in dungeon.MainPath)
         {
             var tile = biomeTiles[biomeMap[n]];
-            for (int x = (int)n.X * _segmentSize; x < ((int)n.X + 1) * _segmentSize; x++)
+            for (int x = (int)n.X * size; x < ((int)n.X + 1) * size + 1; x++)
             {
-                for (int y = (int)n.Y * _segmentSize; y < ((int)n.Y + 1) * _segmentSize; y++)
+                for (int y = (int)n.Y * size; y < ((int)n.Y + 1) * size + 1; y++)
                 {
                     SetCell(x, y, tile);
                 }
@@ -78,11 +91,9 @@ public class DungeonGeneration2D : TileMap
             if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
             foreach (var sp in dungeon.SidePaths[branch[0]])
             {
-                GD.Print("yup");
-
-                for (int x = (int)sp.X * _segmentSize; x < ((int)sp.X + 1) * _segmentSize; x++)
+                for (int x = (int)sp.X * size; x < ((int)sp.X + 1) * size + 1; x++)
                 {
-                    for (int y = (int)sp.Y * _segmentSize; y < ((int)sp.Y + 1) * _segmentSize; y++)
+                    for (int y = (int)sp.Y * size; y < ((int)sp.Y + 1) * size + 1; y++)
                     {
                         SetCell(x, y, tile);
                     }
@@ -92,6 +103,10 @@ public class DungeonGeneration2D : TileMap
         foreach (var n in dungeon.FullMask)
         {
             SetCell((int)n.X + 1, (int)n.Y + 1, -1);
+        }
+        foreach (var r in dungeonFeatures.Rooms)
+        {
+            SetCell((int)r.X + 1, (int)r.Y + 1, roomTile);
         }
         foreach (var d in dungeonFeatures.Doors)
         {
@@ -117,6 +132,7 @@ public class DungeonGeneration2D : TileMap
         {
             SetCell((int)tk.Value.X + 1, (int)tk.Value.Y + 1, keyTile);
         }
+
     }
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
     {

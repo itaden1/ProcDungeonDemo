@@ -19,15 +19,45 @@ namespace GamePasta.DungeonAlgorythms
         public Dictionary<Vector2, Vector2> Gates => _gates;
 
         public Dictionary<Vector2, Vector2> GateSwitches => _gateSwitches;
+
         public Dictionary<Vector2, Vector2> Treasures => _treasures;
         public Dictionary<Vector2, Vector2> TreasureKeys => _treasureKeys;
         public Dictionary<Vector2, Vector2> Doors => _doors;
         public Dictionary<Vector2, Vector2> DoorKeys => _doorKeys;
 
+        private List<Vector2> _rooms = new List<Vector2>();
+        public List<Vector2> Rooms => _rooms;
+
         public FeatureBuilder(GridDungeon dungeon)
         {
             _dungeon = dungeon;
             AddFeatures();
+            AddRooms();
+        }
+
+        private void AddRooms()
+        {
+            List<Vector2> allSegments = new List<Vector2>();
+            allSegments.AddRange(_dungeon.MainPath);
+            foreach (var sp in _dungeon.SidePaths)
+            {
+                allSegments.AddRange(sp.Value);
+            }
+
+            foreach (var s in allSegments)
+            {
+                List<Rect> available = new List<Rect>(_dungeon.Chambers[s]);
+                int clearings = _random.Next(1, 3);
+                for (var i = 0; i <= clearings; i++)
+                {
+                    Rect clearing = available[_random.Next(0, available.Count - 1)];
+                    Rect room = clearing.Expand(-1);
+                    _rooms.AddRange(room.ToList());
+
+                    available.Remove(clearing);
+                }
+
+            }
         }
 
         private void AddFeatures()
@@ -41,10 +71,10 @@ namespace GamePasta.DungeonAlgorythms
 
                     switch (featureType)
                     {
-                        case int x when x <= 40 && x >= 0:
+                        case int x when x <= 30 && x >= 0:
                             buildLockedDoorFeature(k);
                             break;
-                        case int x when x > 40 && x <= 60:
+                        case int x when x > 30 && x <= 60:
                             buildSecretTreasureFeature(k);
                             break;
                         case int x when x > 60 && x <= 100:
@@ -56,14 +86,18 @@ namespace GamePasta.DungeonAlgorythms
         }
         private void buildLoopFeature(KeyValuePair<Vector2, List<Vector2>> k)
         {
-            List<Vector2> nodeList = new List<Vector2>(k.Value);
-            nodeList.Reverse();
+            List<Vector2> nodeList = _dungeon.SidePaths[k.Value[0]];
+            // nodeList.Reverse();
             bool found = false;
-            foreach (var node in nodeList)
+
+            for (var i = nodeList.Count - 1; i > 0; i--)
             {
+
+                var node = nodeList[i];
                 var neighbours = Helpers.GetNeighbours(node);
                 foreach (var n in neighbours)
                 {
+
                     if (_dungeon.MainPath.Contains(n) && n != k.Key && n != _dungeon.MainPath[_dungeon.MainPath.Count - 1])
                     {
                         List<Vector2> connectionData = _dungeon.CreateConnections(n, node, _dungeon.MainDetail[n], _dungeon.SideDetail[node]);
@@ -71,12 +105,11 @@ namespace GamePasta.DungeonAlgorythms
                         _dungeon.AddConnection(cKey.ToString(), connectionData);
 
 
-
                         var gate = PlaceDoor(connectionData, _dungeon.FullMask);
                         if (gate != null)
                         {
                             _gates[k.Key] = (Vector2)gate;
-                            var gateKey = PlaceItem(_dungeon.Chambers[node]);
+                            var gateKey = PlaceItem(_dungeon.Chambers[nodeList[0]]);
                             _gateSwitches[_gates[k.Key]] = gateKey;
                         }
                         found = true;

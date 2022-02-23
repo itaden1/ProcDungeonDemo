@@ -281,10 +281,11 @@ namespace GamePasta.DungeonAlgorythms
 
                 foreach (var n in neighbours)
                 {
-                    Godot.GD.Print(neighbourMask.Contains(n));
                     // TODO make map size configurable
                     bool valid = true;
-                    if (n.X < 0 || n.X >= _segments - 1 || n.Y < 0 || n.Y >= _segments - 1 || neighbourMask.Contains(n)) valid = false;
+                    // if (n.X < 0 || n.X >= _segments - 1 || n.Y < 0 || n.Y >= _segments - 1 || neighbourMask.Contains(n)) valid = false;
+                    if (neighbourMask.Contains(n)) valid = false;
+
                     if (valid)
                     {
                         validNeighbours.Add(n);
@@ -322,7 +323,6 @@ namespace GamePasta.DungeonAlgorythms
                 neighbourMask.Add(neighbour);
             }
 
-            Godot.GD.Print("*****");
             return branches;
         }
 
@@ -336,8 +336,7 @@ namespace GamePasta.DungeonAlgorythms
                 {
                     if (_mask.Contains(vec)) continue;  // we may want to roll to see which path gets created
 
-                    Godot.GD.Print($"({branch.Key.X},{branch.Key.Y}) -> ({vec.X},{vec.Y})");
-                    int roomCount = _random.Next(2, 3);
+                    int roomCount = _random.Next(3, 5);
 
                     // execute random walk on the neighbour
                     RandomWalk sideWalk = new RandomWalk(
