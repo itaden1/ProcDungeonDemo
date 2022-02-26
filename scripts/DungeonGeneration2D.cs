@@ -32,10 +32,28 @@ public class DungeonGeneration2D : TileMap
         FeatureBuilder dungeonFeatures = new FeatureBuilder(dungeon);
 
         Dictionary<System.Numerics.Vector2, string> biomeMap = new Dictionary<System.Numerics.Vector2, string>();
+        Dictionary<System.Numerics.Vector2, int> challengeMap = new Dictionary<System.Numerics.Vector2, int>();
+
 
         var gyDone = false;
         for (var i = 0; i < dungeon.MainPath.Count; i++)
         {
+            challengeMap[dungeon.MainPath[i]] = i;
+
+            if (dungeon.MainPathBranches.ContainsKey(dungeon.MainPath[i]))
+            {
+                var sidePath = dungeon.MainPathBranches[dungeon.MainPath[i]];
+
+                if (dungeon.SidePaths.ContainsKey(sidePath[0]))
+                {
+                    foreach (var sp in dungeon.SidePaths[sidePath[0]])
+                    {
+                        challengeMap[dungeon.MainPath[i]] = i + 1;
+                    }
+                }
+            }
+
+
             if (i < dungeon.MainPath.Count / 3)
             {
                 biomeMap[dungeon.MainPath[i]] = "forrest";
@@ -57,7 +75,6 @@ public class DungeonGeneration2D : TileMap
                         }
                     }
                     gyDone = true;
-
                 }
             }
             else if (i < dungeon.MainPath.Count / 3 * 2)
@@ -164,6 +181,10 @@ public class DungeonGeneration2D : TileMap
             SetCell((int)d.Value.X + 1, (int)d.Value.Y + 1, doorTile);
             var doorKey = dungeonFeatures.DoorKeys[d.Value];
             SetCell((int)doorKey.X + 1, (int)doorKey.Y + 1, keyTile);
+        }
+
+        foreach (var r in dungeon.Chambers)
+        {
 
         }
 
@@ -179,7 +200,6 @@ public class DungeonGeneration2D : TileMap
             var treasureKey = dungeonFeatures.TreasureKeys[t.Value];
             SetCell((int)treasureKey.X + 1, (int)treasureKey.Y + 1, keyTile);
         }
-
     }
     private void _onRegenerateButtonPressed(int rooms, int mapSize)
     {
