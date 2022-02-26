@@ -36,6 +36,7 @@ namespace GamePasta.DungeonAlgorythms
         private int _mapSize;
         private int _segments;
         private int _segmentSize;
+        public int segmentSize => _segmentSize;
 
         private int _roomCount;
 
@@ -364,7 +365,7 @@ namespace GamePasta.DungeonAlgorythms
             return paths;
         }
 
-        private List<Vector2> OffsetPath(Vector2 vec, List<Vector2> items)
+        public List<Vector2> OffsetPath(Vector2 vec, List<Vector2> items)
         {
             // add an offset to each vector in the supplied list based of position of parent vector
             List<Vector2> returnItems = new List<Vector2>();

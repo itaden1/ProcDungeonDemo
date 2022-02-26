@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://scripts/DungeonGeneration2D.cs" type="Script" id=1]
 [ext_resource path="res://tiles/stone_soup/catacombs/catacombs_0.png" type="Texture" id=2]
@@ -14,6 +14,8 @@
 [ext_resource path="res://tiles/stone_soup/mangrove_2.png" type="Texture" id=12]
 [ext_resource path="res://tiles/stone_soup/brick_dark_2.png" type="Texture" id=13]
 [ext_resource path="res://tiles/stone_soup/permarock_red_0.png" type="Texture" id=14]
+[ext_resource path="res://tiles/stone_soup/shaft.png" type="Texture" id=15]
+[ext_resource path="res://tiles/stone_soup/tree_2_yellow.png" type="Texture" id=16]
 
 [sub_resource type="TileSet" id=1]
 0/name = "wall_1"
@@ -170,6 +172,34 @@
 12/shape_one_way_margin = 0.0
 12/shapes = [  ]
 12/z_index = 0
+13/name = "pit"
+13/texture = ExtResource( 15 )
+13/tex_offset = Vector2( 0, 0 )
+13/modulate = Color( 1, 1, 1, 1 )
+13/region = Rect2( 1, 0, 31, 30 )
+13/tile_mode = 0
+13/occluder_offset = Vector2( 0, 0 )
+13/navigation_offset = Vector2( 0, 0 )
+13/shape_offset = Vector2( 0, 0 )
+13/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+13/shape_one_way = false
+13/shape_one_way_margin = 0.0
+13/shapes = [  ]
+13/z_index = 0
+14/name = "tree2"
+14/texture = ExtResource( 16 )
+14/tex_offset = Vector2( 0, 0 )
+14/modulate = Color( 1, 1, 1, 1 )
+14/region = Rect2( -2, -3, 39, 40 )
+14/tile_mode = 0
+14/occluder_offset = Vector2( 0, 0 )
+14/navigation_offset = Vector2( 0, 0 )
+14/shape_offset = Vector2( 0, 0 )
+14/shape_transform = Transform2D( 1, 0, 0, 1, 0, 0 )
+14/shape_one_way = false
+14/shape_one_way_margin = 0.0
+14/shapes = [  ]
+14/z_index = 0
 
 [node name="Node" type="Node"]
 

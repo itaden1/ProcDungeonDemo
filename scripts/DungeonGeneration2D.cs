@@ -32,26 +32,68 @@ public class DungeonGeneration2D : TileMap
         FeatureBuilder dungeonFeatures = new FeatureBuilder(dungeon);
 
         Dictionary<System.Numerics.Vector2, string> biomeMap = new Dictionary<System.Numerics.Vector2, string>();
-        List<string> biomes = new List<string>() { "cave", "forrest", "catacombs" };
+
+        var gyDone = false;
         for (var i = 0; i < dungeon.MainPath.Count; i++)
         {
             if (i < dungeon.MainPath.Count / 3)
             {
                 biomeMap[dungeon.MainPath[i]] = "forrest";
+                if (dungeon.MainPathBranches.ContainsKey(dungeon.MainPath[i]))
+                {
+                    var branch = dungeon.MainPathBranches[dungeon.MainPath[i]];
+
+                    if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
+
+                    foreach (var sp in dungeon.SidePaths[branch[0]])
+                    {
+                        if (gyDone)
+                        {
+                            biomeMap[sp] = "forrest";
+                        }
+                        else
+                        {
+                            biomeMap[sp] = "graveyard";
+                        }
+                    }
+                    gyDone = true;
+
+                }
             }
             else if (i < dungeon.MainPath.Count / 3 * 2)
             {
                 biomeMap[dungeon.MainPath[i]] = "cave";
+                if (dungeon.MainPathBranches.ContainsKey(dungeon.MainPath[i]))
+                {
+                    var branch = dungeon.MainPathBranches[dungeon.MainPath[i]];
+
+                    if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
+                    foreach (var sp in dungeon.SidePaths[branch[0]])
+                    {
+                        biomeMap[sp] = "cave";
+                    }
+                }
             }
             else
             {
                 biomeMap[dungeon.MainPath[i]] = "catacombs";
+                if (dungeon.MainPathBranches.ContainsKey(dungeon.MainPath[i]))
+                {
+                    var branch = dungeon.MainPathBranches[dungeon.MainPath[i]];
+
+                    if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
+                    foreach (var sp in dungeon.SidePaths[branch[0]])
+                    {
+                        biomeMap[sp] = "catacombs";
+                    }
+                }
             }
         }
         Dictionary<string, int> biomeTiles = new Dictionary<string, int>()
         {
             {"cave", TileSet.FindTileByName("cave")},
             {"forrest", TileSet.FindTileByName("tree")},
+            {"graveyard", TileSet.FindTileByName("tree2")},
             {"catacombs", TileSet.FindTileByName("wall_3")}
         };
 
@@ -69,6 +111,7 @@ public class DungeonGeneration2D : TileMap
         int treasureTile = TileSet.FindTileByName("chest");
         int secretDoorTile = TileSet.FindTileByName("secret_passage");
         int roomTile = TileSet.FindTileByName("room");
+        int pitTile = TileSet.FindTileByName("pit");
 
 
         var size = _segmentSize;
@@ -83,17 +126,15 @@ public class DungeonGeneration2D : TileMap
                     SetCell(x, y, tile);
                 }
             }
-            if (!dungeon.MainPathBranches.ContainsKey(n)) continue;
-
-
-            var branch = dungeon.MainPathBranches[n];
-
-            if (!dungeon.SidePaths.ContainsKey(branch[0])) continue;
-            foreach (var sp in dungeon.SidePaths[branch[0]])
+        }
+        foreach (var sp in dungeon.SidePaths)
+        {
+            foreach (var n in sp.Value)
             {
-                for (int x = (int)sp.X * size; x < ((int)sp.X + 1) * size + 1; x++)
+                var tile = biomeTiles[biomeMap[n]];
+                for (int x = (int)n.X * size; x < ((int)n.X + 1) * size + 1; x++)
                 {
-                    for (int y = (int)sp.Y * size; y < ((int)sp.Y + 1) * size + 1; y++)
+                    for (int y = (int)n.Y * size; y < ((int)n.Y + 1) * size + 1; y++)
                     {
                         SetCell(x, y, tile);
                     }
@@ -104,6 +145,16 @@ public class DungeonGeneration2D : TileMap
         {
             SetCell((int)n.X + 1, (int)n.Y + 1, -1);
         }
+        foreach (var p in dungeonFeatures.ExtraLoops)
+        {
+            if (biomeMap[p.Key] == "forrest")
+            {
+                foreach (var v in p.Value)
+                {
+                    SetCell((int)v.X, (int)v.Y, -1);
+                }
+            }
+        }
         foreach (var r in dungeonFeatures.Rooms)
         {
             SetCell((int)r.X + 1, (int)r.Y + 1, roomTile);
@@ -111,26 +162,22 @@ public class DungeonGeneration2D : TileMap
         foreach (var d in dungeonFeatures.Doors)
         {
             SetCell((int)d.Value.X + 1, (int)d.Value.Y + 1, doorTile);
+            var doorKey = dungeonFeatures.DoorKeys[d.Value];
+            SetCell((int)doorKey.X + 1, (int)doorKey.Y + 1, keyTile);
+
         }
-        foreach (var k in dungeonFeatures.DoorKeys)
-        {
-            SetCell((int)k.Value.X + 1, (int)k.Value.Y + 1, keyTile);
-        }
+
         foreach (var g in dungeonFeatures.Gates)
         {
             SetCell((int)g.Value.X + 1, (int)g.Value.Y + 1, secretDoorTile);
-        }
-        foreach (var s in dungeonFeatures.GateSwitches)
-        {
-            SetCell((int)s.Value.X + 1, (int)s.Value.Y + 1, pressurePlateTile);
+            var gateSwitch = dungeonFeatures.GateSwitches[g.Value];
+            SetCell((int)gateSwitch.X + 1, (int)gateSwitch.Y + 1, pressurePlateTile);
         }
         foreach (var t in dungeonFeatures.Treasures)
         {
             SetCell((int)t.Value.X + 1, (int)t.Value.Y + 1, treasureTile);
-        }
-        foreach (var tk in dungeonFeatures.TreasureKeys)
-        {
-            SetCell((int)tk.Value.X + 1, (int)tk.Value.Y + 1, keyTile);
+            var treasureKey = dungeonFeatures.TreasureKeys[t.Value];
+            SetCell((int)treasureKey.X + 1, (int)treasureKey.Y + 1, keyTile);
         }
 
     }

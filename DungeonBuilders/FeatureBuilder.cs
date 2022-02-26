@@ -28,26 +28,24 @@ namespace GamePasta.DungeonAlgorythms
         private List<Vector2> _rooms = new List<Vector2>();
         public List<Vector2> Rooms => _rooms;
 
+        private Dictionary<Vector2, List<Vector2>> _extraLoops = new Dictionary<Vector2, List<Vector2>>();
+        public Dictionary<Vector2, List<Vector2>> ExtraLoops => _extraLoops;
         public FeatureBuilder(GridDungeon dungeon)
         {
             _dungeon = dungeon;
             AddFeatures();
             AddRooms();
+            AddExtraLoops();
         }
 
         private void AddRooms()
         {
-            List<Vector2> allSegments = new List<Vector2>();
-            allSegments.AddRange(_dungeon.MainPath);
-            foreach (var sp in _dungeon.SidePaths)
-            {
-                allSegments.AddRange(sp.Value);
-            }
+            List<Vector2> allSegments = GetAllSegments(_dungeon);
 
             foreach (var s in allSegments)
             {
                 List<Rect> available = new List<Rect>(_dungeon.Chambers[s]);
-                int clearings = _random.Next(1, 3);
+                int clearings = _random.Next(0, 3);
                 for (var i = 0; i <= clearings; i++)
                 {
                     Rect clearing = available[_random.Next(0, available.Count - 1)];
@@ -58,6 +56,63 @@ namespace GamePasta.DungeonAlgorythms
                 }
 
             }
+        }
+
+        private List<Vector2> GetAllSegments(GridDungeon dungeon)
+        {
+            List<Vector2> allSegments = new List<Vector2>();
+            allSegments.AddRange(dungeon.MainPath);
+            foreach (var sp in dungeon.SidePaths)
+            {
+                allSegments.AddRange(sp.Value);
+            };
+            return allSegments;
+        }
+
+        private void AddExtraLoops()
+        {
+            List<Vector2> allSegments = GetAllSegments(_dungeon);
+            foreach (var s in allSegments)
+            {
+                var placeFeature = _random.Next(0, 10);
+                if (placeFeature >= 6)
+                {
+                    List<Vector2> neighbours = Helpers.GetNeighbours(s);
+                    foreach (var n in neighbours)
+                    {
+                        if (!allSegments.Contains(n)) continue;
+                        ConnectionKey cKey = new ConnectionKey(s, n);
+                        if (_dungeon.ConnectionDetail.ContainsKey(cKey.ToString())) continue;
+                        ConnectionKey cKey2 = new ConnectionKey(s, n);
+                        if (_dungeon.ConnectionDetail.ContainsKey(cKey2.ToString())) continue;
+
+                        List<Vector2> d1;
+                        List<Vector2> d2;
+
+                        if (_dungeon.MainDetail.ContainsKey(s))
+                        {
+                            d1 = _dungeon.MainDetail[s];
+                        }
+                        else
+                        {
+                            d1 = _dungeon.SideDetail[s];
+                        }
+                        if (_dungeon.MainDetail.ContainsKey(n))
+                        {
+                            d2 = _dungeon.MainDetail[n];
+                        }
+                        else
+                        {
+                            d2 = _dungeon.SideDetail[n];
+                        }
+                        List<Vector2> connectionData = _dungeon.CreateConnections(s, n, d1, d2);
+                        _extraLoops[s] = connectionData;
+
+                    }
+                }
+                else continue;
+            }
+
         }
 
         private void AddFeatures()
